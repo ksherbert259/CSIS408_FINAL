@@ -1,0 +1,29 @@
+<?php
+
+//************************
+// Function for global functions
+//************************
+
+// Find the $_GET variable
+function GetVar($name, $default)
+{
+  $fix = (isset($_GET[$name])) ? $_GET[$name] : $default;
+
+  return $fix;
+}
+
+// Find the $_POST variable
+function PostVar($name, $default)
+{
+  $fix = (isset($_POST[$name])) ? $_POST[$name] : $default;
+
+  return $fix;
+}
+
+// Redirect the header
+function RedirectHeader($location)
+{
+  Header('Location: ' . $location);
+}
+
+?>
