@@ -1,3 +1,22 @@
+<?
+
+  require "/spring_2022/csis408/social02/env/include.phtml";
+
+  // Get the variable names
+  $xTASK = PostVar('xTASK', '');
+  $xUSERNAME = PostVar('xUSERNAME', '');
+  $xPASSWORD = PostVar('xPASSWORD', '');
+  $xFULLNAME = PostVar('xFULLNAME', '');
+
+  if($xTASK === 'INSERT')
+  {
+    $USER = array();
+    $USER['username'] = $xUSERNAME;
+    $USER['password'] = $xPASSWORD;
+
+  }
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <meta charset="UTF-8">
@@ -8,6 +27,16 @@
 </style>
 <script src=""></script>
 <body>
-
+  <form method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+    <label for="username">Username</label>
+    <input type="text" id="xUSERNAME" name="xUSERNAME"><br>
+    <label for="fullname">Full Name</label>
+    <input type="text" id="xFULLNAME" name="xFULLNAME"><br>
+    <label for="password">Password</label>
+    <input type="hidden" id="xPASSWORD" name="xPASSWORD"><br>
+    <label for="profilepicture">Upload a Profile Picture</label>
+    <input type="file" id="xPROFILEPICTURE" name="xPROFILEPICTURE"><br>
+    <input type="submit" value="Create Account" name="submit">
+  </form>
 </body>
 </html>
