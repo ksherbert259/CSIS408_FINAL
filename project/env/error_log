@@ -1,0 +1,5 @@
+[04-Apr-2022 18:53:18 UTC] PHP Warning:  Use of undefined constant DB_LOCATION - assumed 'DB_LOCATION' (this will throw an Error in a future version of PHP) in /home/jwestfal/drwestfall.us/spring_2022/csis408/social02/env/db.phtml on line 8
+[04-Apr-2022 18:53:18 UTC] PHP Warning:  Use of undefined constant DB_USERNAME - assumed 'DB_USERNAME' (this will throw an Error in a future version of PHP) in /home/jwestfal/drwestfall.us/spring_2022/csis408/social02/env/db.phtml on line 8
+[04-Apr-2022 18:53:18 UTC] PHP Warning:  Use of undefined constant DB_PASSWORD - assumed 'DB_PASSWORD' (this will throw an Error in a future version of PHP) in /home/jwestfal/drwestfall.us/spring_2022/csis408/social02/env/db.phtml on line 8
+[04-Apr-2022 18:53:18 UTC] PHP Warning:  mysqli_connect(): (HY000/2005): Unknown MySQL server host 'DB_LOCATION' (-2) in /home/jwestfal/drwestfall.us/spring_2022/csis408/social02/env/db.phtml on line 8
+[04-Apr-2022 18:54:11 UTC] PHP Warning:  mysqli_connect(): (HY000/2005): Unknown MySQL server host '/home/jwestfal/drwestfall.us/spring_2022/csis316/database' (-2) in /home/jwestfal/drwestfall.us/spring_2022/csis408/social02/env/env.phtml on line 34

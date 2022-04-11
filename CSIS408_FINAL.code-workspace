@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"deploy": {
+		  "targets": [
+			  {
+				  "type": "ftp",
+				  "name": "CSIS 408 - Team Social 02",
+				  "description": "CSIS 408 - Team Social 02",
+				  "dir": "/csis408/social02",
+				  "host": "ftp.drwestfall.us", "port": 21,
+				  "user": "student@drwestfall.us", "password": "csis2022",
+	
+				  "mappings": [
+					{
+						"source": "project",
+						"target": ""
+					}
+				],
+			  }
+		  ]
+		}
+	  }
+	
+}
