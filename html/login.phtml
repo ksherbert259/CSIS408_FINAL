@@ -1,6 +1,6 @@
 <?
 
-  require "/spring_2022/csis408/social02/env/include.phtml";
+  require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
 
   // Get the variable names
   $xTASK = PostVar('xTASK', '');
@@ -8,13 +8,16 @@
   $xPASSWORD = PostVar('xPASSWORD', '');
   $xFULLNAME = PostVar('xFULLNAME', '');
 
+  $USER = array();
   if($xTASK === 'INSERT')
   {
-    $USER = array();
     $USER['username'] = $xUSERNAME;
     $USER['password'] = $xPASSWORD;
+    $USER['fullname'] = $xFULLNAME;
 
+    var_dump($USER);
   }
+  var_dump($xTASK);
 
 ?>
 <!DOCTYPE html>
@@ -25,18 +28,27 @@
 <link rel="stylesheet" href="">
 <style>
 </style>
-<script src=""></script>
+<script src="">
+  function Validate(theform, thetask)
+  {
+    if(theform.xUSERNAME.value === '')
+    {
+      console.log("Username sucks");
+    }
+  }
+
+</script>
 <body>
   <form method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
-    <label for="username">Username</label>
+    <label for="xUSERNAME">Username</label>
     <input type="text" id="xUSERNAME" name="xUSERNAME"><br>
-    <label for="fullname">Full Name</label>
+    <label for="xFULLNAME">Full Name</label>
     <input type="text" id="xFULLNAME" name="xFULLNAME"><br>
-    <label for="password">Password</label>
-    <input type="hidden" id="xPASSWORD" name="xPASSWORD"><br>
-    <label for="profilepicture">Upload a Profile Picture</label>
+    <label for="xPASSWORD">Password</label>
+    <input type="password" id="xPASSWORD" name="xPASSWORD"><br>
+    <label for="xPROFILEPICTURE">Upload a Profile Picture</label>
     <input type="file" id="xPROFILEPICTURE" name="xPROFILEPICTURE"><br>
-    <input type="submit" value="Create Account" name="submit">
+    <input type="submit" value="INSERT" name="xTASK">
   </form>
 </body>
 </html>

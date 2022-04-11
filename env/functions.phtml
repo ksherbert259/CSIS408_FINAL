@@ -28,6 +28,7 @@ function RedirectHeader($location)
 // Insert a new record into the selected table
 function DB_Insert($table, $data)
 {
+  global $DB;
   $success = false;
 
   // Retrieve an indexed list of all tables
@@ -39,6 +40,12 @@ function DB_Insert($table, $data)
   if(!$okay)
   {
     echo 'Failed to find a valid table. - ' . $table;
+  }
+
+  $query = '';
+  foreach($data as $idx => $value)
+  {
+    $query .= $idx . ' = ' . $value;
   }
 
   return $success;
