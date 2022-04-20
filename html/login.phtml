@@ -8,16 +8,37 @@
   $xPASSWORD = PostVar('xPASSWORD', '');
   $xFULLNAME = PostVar('xFULLNAME', '');
 
+  // Sanitize the input
+  if($xTASK === 'LOGIN')
+  {
+    if(preg_match("[^A-Za-z0-9]", $xUSERNAME) || strlen($xUSERNAME) > 64) {
+      // TODO Error
+    }
+  }
+
   $USER = array();
-  if($xTASK === 'INSERT')
+  if($xTASK === 'LOGIN')
   {
     $USER['username'] = $xUSERNAME;
     $USER['password'] = $xPASSWORD;
-    $USER['fullname'] = $xFULLNAME;
 
-    var_dump($USER);
+    // Search for the user with the given username and password
+    $user = DB_Search('users', $USER);
+
+    // Make sure only 1 record is returned
+    if(count($user) !== 1)
+    {
+      echo 'Could not find matching username and password.';
+    }
+    else
+    {
+      $acc_type = ($user[0]['is_admin'] === 0) ? 'users' : 'administrators';
+      $_SESSION['USER_ARRAY'] = $user[0];
+      $_SESSION['USER_TYPE'] = $acc_type;
+      header('Location: ' . PROJECT_HTML . '/' . $acc_type . '/index.phtml');
+      exit;
+    }
   }
-  var_dump($xTASK);
 
 ?>
 <!DOCTYPE html>
@@ -28,18 +49,34 @@
 <link rel="stylesheet" href="">
 <style>
 </style>
-<script src="">
+<script>
   function Validate(theform, thetask)
   {
-    if(theform.xUSERNAME.value === '')
+    var okay = false;
+    do
     {
-      console.log("Username sucks");
+      // Verify the username is not empty
+      if(theform.xUSERNAME.value === '')
+      {
+        console.log("Username sucks");
+      }
+
+      okay = true;
+    }
+    while(0);
+
+    // Submit the form if all checks succeed
+    if(okay)
+    {
+      theform.xTASK.value = thetask;
+      theform.submit();
     }
   }
 
 </script>
 <body>
-  <form method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+  <form name="xFORM" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+    <input type="hidden" name="xTASK" value="">
     <label for="xUSERNAME">Username</label>
     <input type="text" id="xUSERNAME" name="xUSERNAME"><br>
     <label for="xFULLNAME">Full Name</label>
@@ -48,7 +85,7 @@
     <input type="password" id="xPASSWORD" name="xPASSWORD"><br>
     <label for="xPROFILEPICTURE">Upload a Profile Picture</label>
     <input type="file" id="xPROFILEPICTURE" name="xPROFILEPICTURE"><br>
-    <input type="submit" value="INSERT" name="xTASK">
+    <button onclick="Validate(document.xFORM, 'LOGIN')">
   </form>
 </body>
 </html>

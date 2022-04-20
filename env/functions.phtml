@@ -12,7 +12,7 @@ function GetVar($name, $default)
 }
 
 // Find the $_POST variable
-function PostVar($name, $default)
+function PostVar($name, $default = '')
 {
   $fix = (isset($_POST[$name])) ? $_POST[$name] : $default;
   return $fix;
@@ -39,17 +39,70 @@ function DB_Insert($table, $data)
   $okay = (array_key_exists($table, $all_tables));
   if(!$okay)
   {
-    echo 'Failed to find a valid table. - ' . $table;
+    echo 'Failed to find a valid table. - ' . $table . "\n";
   }
 
   $query = '';
-  foreach($data as $idx => $value)
+  $query .= 'INSERT INTO ' . $table . '(';
+  foreach($data as $column => $value)
   {
-    $query .= $idx . ' = ' . $value;
+    $query .= 'VALUES ' . $column . ' = ' . $value;
   }
+  $query .= ' INTO ' . $table;
 
+  $okay = $DB->query($query);
+  if(!$okay)
+  {
+    echo 'Failed to insert the query with table - ' . $table . "\n";
+    echo 'Query : ' . $query . "\n";;
+  }
   return $success;
 }
 
+function DB_Search($table, $data)
+{
+  global $DB;
+  $record = array();
+  // 'testuser'
+
+  // Retrieve an indexed list of all tables
+  $all_tables = json_decode(DB_TABLES);
+  $all_tables = array_flip($all_tables);  
+
+  // Check if the given table exists
+  $okay = (array_key_exists($table, $all_tables));
+  if(!$okay)
+  {
+    echo 'Failed to find a valid table. - ' . $table . "\n";
+  }
+
+  // Find the used columns
+  $columns = '';
+  foreach($data as $column => $value)
+  {
+    $columns .= $column . ', ';
+  }
+  $columns = rtrim($columns, ', ');
+
+  $query = '';
+  // $query .= 'SELECT ' . $columns . ' FROM ' . $table . ' WHERE';
+  $query .= 'SELECT * FROM ' . $table . ' WHERE';
+  foreach($data as $column => $value)
+  {
+    $query .= ' ' . $column . ' = \'' . $value . '\' AND';
+  }
+  $query = rtrim($query, ' AND');
+  
+  echo 'QUERY : <br>' . "\n" . $query . '<br>' . "\n";
+
+  $rows = array();
+  $result = $DB->query($query);
+  while($row = $result->fetch_row())
+  {
+    $rows[] = $row;
+  }
+
+  return $rows;
+}
 
 ?>
