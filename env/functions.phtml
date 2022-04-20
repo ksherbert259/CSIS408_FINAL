@@ -1,0 +1,55 @@
+<?php
+
+//************************
+// Function for global functions
+//************************
+
+// Find the $_GET variable
+function GetVar($name, $default)
+{
+  $fix = (isset($_GET[$name])) ? $_GET[$name] : $default;
+  return $fix;
+}
+
+// Find the $_POST variable
+function PostVar($name, $default)
+{
+  $fix = (isset($_POST[$name])) ? $_POST[$name] : $default;
+  return $fix;
+}
+
+// Redirect the header
+function RedirectHeader($location)
+{
+  Header('Location: ' . $location);
+}
+
+
+// Insert a new record into the selected table
+function DB_Insert($table, $data)
+{
+  global $DB;
+  $success = false;
+
+  // Retrieve an indexed list of all tables
+  $all_tables = json_decode(DB_TABLES);
+  $all_tables = array_flip($all_tables);
+
+  // Check if the given table exists
+  $okay = (array_key_exists($table, $all_tables));
+  if(!$okay)
+  {
+    echo 'Failed to find a valid table. - ' . $table;
+  }
+
+  $query = '';
+  foreach($data as $idx => $value)
+  {
+    $query .= $idx . ' = ' . $value;
+  }
+
+  return $success;
+}
+
+
+?>

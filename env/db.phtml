@@ -1,0 +1,13 @@
+<?php
+
+// Check connection
+$DB = mysqli_connect(DB_LOCATION, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
+if (!$DB) {
+  die("Connection failed: " . mysqli_connect_error());
+}
+
+$TBLS = array();
+$TBLS['accounts'] = 'accounts';
+$TBLS['settings'] = 'settings';
+
+?>
