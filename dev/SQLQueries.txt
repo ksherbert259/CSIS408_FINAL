@@ -1,8 +1,21 @@
-SELECT u.id, u.full_name, u.image, u.image_type, u.is_deleted, p.id, p.text, p.user_id, p.image, p.image_type, p.datetime_add, p.is_deleted, c.id, c.post_id, c.user_id, c.text, c.datetime_add, c.is_deleted, r.user_id, r.post_id, r.is_like
-FROM users u
-INNER JOIN posts p ON u.id = p.user_id
-INNER JOIN comments c ON c.post_id = p.id
-INNER JOIN reactions r ON r.post_id = p.id
-INNER JOIN friendswith fw ON fw.user1_id = p.user_id OR fw.user2_id = p.user_id
+FINAL WORKING POSTS QUERY:
+SELECT u.full_name, u.image AS user_image, u.image_type AS user_image_type, u.is_deleted AS user_is_deleted, p.id, p.text, p.user_id, p.image, p.image_type, p.datetime_add, p.is_deleted
+FROM posts p
+LEFT JOIN users u ON u.id = p.user_id
+LEFT JOIN friendswith fw ON fw.user1_id = p.user_id OR fw.user2_id = p.user_id
 WHERE (fw.user1_id = 1 OR fw.user2_id = 1) AND p.user_id != 1
-ORDER BY p.datetime_add DESC
+ORDER BY p.datetime_add DESC;
+
+FINAL WORKING COMMENTS QUERY:
+SELECT *
+FROM comments c
+WHERE c.post_id = 1
+ORDER BY c.datetime_add DESC;
+
+FINAL WORKING REACTIONS QUERY:
+SELECT COUNT(user_id) AS likes
+FROM reactions r
+WHERE post_id = 1 AND is_like = 1;
+SELECT COUNT(user_id) AS dislikes
+FROM reactions r
+WHERE post_id = 1 AND is_like = 0;
