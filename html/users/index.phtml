@@ -1,3 +1,4 @@
+<?php  require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <meta charset="UTF-8">
@@ -8,6 +9,21 @@
 </style>
 <script src=""></script>
 <body>
+<?php
+$sql = "SELECT u.full_name, u.image AS user_image, u.image_type AS user_image_type, u.is_deleted AS user_is_deleted, p.id, p.text, p.user_id, p.image, p.image_type, p.datetime_add, p.is_deleted FROM posts p LEFT JOIN users u ON u.id = p.user_id LEFT JOIN friendswith fw ON fw.user1_id = p.user_id OR fw.user2_id = p.user_id WHERE (fw.user1_id = 1 OR fw.user2_id = 1) AND p.user_id != 1 ORDER BY p.datetime_add DESC";
+if($result = mysqli_query($DB, $sql)){
+    if(mysqli_num_rows($result) > 0){
+        $row = mysqli_fetch_array($result);
+        echo "<div class=post>";
+            echo "<p class=caption>" . $row['text'] . "</p>";
+        echo "</div>";
 
+        // Free result set
+        mysqli_free_result($result);
+    } else {
+        echo "No posts yet! Make some friends to get started.";
+    }
+}
+?>
 </body>
 </html>
