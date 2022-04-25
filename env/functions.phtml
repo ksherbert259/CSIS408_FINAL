@@ -11,10 +11,18 @@ function GetVar($name, $default)
   return $fix;
 }
 
-// Find the $_POST variable
+// Find the $_POST array
 function PostVar($name, $default = '')
 {
-  $fix = (isset($_POST[$name])) ? $_POST[$name] : $default;
+  $fix = (array_key_exists($name, $_POST)) ? $_POST[$name] : $default;
+  return $fix;
+}
+
+// Find the $_POST variable
+function PostFile($name)
+{
+  $default = array('name' => '', 'type' => '', 'size' => 0, 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'full_path' => '');
+  $fix = (isset($_FILES[$name])) ? $_FILES[$name] : $default;
   return $fix;
 }
 
@@ -42,12 +50,18 @@ function DB_Insert($table, $data)
     echo 'Failed to find a valid table. - ' . $table . "\n";
   }
 
+  // SQL Format. Follow this : KSH : 04/25/2022
+  // INSERT INTO *tbl_name* (col1, col2, col3, col4) VALUES (val1, val2, val3, val4);
   $query = '';
-  $query .= 'INSERT INTO ' . $table . '(';
+
+  $query = '';
+  $query .= 'INSERT INTO ' . $table . ' VALUES(';
   foreach($data as $column => $value)
   {
-    $query .= 'VALUES ' . $column . ' = ' . $value;
+    $query .= $column . ' = \'' . $value . '\',';
   }
+
+  $query = rtrim($query, ',');
   $query .= ' INTO ' . $table;
 
   $okay = $DB->query($query);
@@ -56,6 +70,7 @@ function DB_Insert($table, $data)
     echo 'Failed to insert the query with table - ' . $table . "\n";
     echo 'Query : ' . $query . "\n";;
   }
+
   return $success;
 }
 
@@ -67,7 +82,7 @@ function DB_Search($table, $data)
 
   // Retrieve an indexed list of all tables
   $all_tables = json_decode(DB_TABLES);
-  $all_tables = array_flip($all_tables);  
+  $all_tables = array_flip($all_tables);
 
   // Check if the given table exists
   $okay = (array_key_exists($table, $all_tables));
@@ -92,7 +107,7 @@ function DB_Search($table, $data)
     $query .= ' ' . $column . ' = \'' . $value . '\' AND';
   }
   $query = rtrim($query, ' AND');
-  
+
   echo 'QUERY : <br>' . "\n" . $query . '<br>' . "\n";
 
   $rows = array();

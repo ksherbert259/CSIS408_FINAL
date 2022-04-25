@@ -8,6 +8,15 @@
   $xPASSWORD = PostVar('xPASSWORD', '');
   $xFULLNAME = PostVar('xFULLNAME', '');
 
+  // Redirect the user to the appropriate landing page
+  if(isset($_SESSION['USER_ID']))
+  {
+    echo 'You are currently logged in as "' . $_SESSION['USER_ARRAY']['full_name'] . '"<br>' . "\n";
+    echo 'This account is a ' . $_SESSION['USER_TYPE'] . '<br>' . "\n";
+    // header('Location: ' . PROJECT_HTML . '/' . $_SESSION['USER_TYPE'] . '/index.phtml');
+    // exit;
+  }
+
   // Sanitize the input
   if($xTASK === 'LOGIN')
   {
@@ -34,6 +43,7 @@
     {
       $acc_type = ($user[0]['is_admin'] === 0) ? 'users' : 'administrators';
       $_SESSION['USER_ARRAY'] = $user[0];
+      $_SESSION['USER_ID'] = $user[0]['id'];
       $_SESSION['USER_TYPE'] = $acc_type;
       header('Location: ' . PROJECT_HTML . '/' . $acc_type . '/index.phtml');
       exit;
@@ -76,8 +86,10 @@
 </script>
 <body>
   <form name="xFORM" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+  <div class="mb-3 mt-3">
     <input type="hidden" name="xTASK" value="">
     <label for="xUSERNAME">Username</label>
+  </div>
     <input type="text" id="xUSERNAME" name="xUSERNAME"><br>
     <label for="xFULLNAME">Full Name</label>
     <input type="text" id="xFULLNAME" name="xFULLNAME"><br>
