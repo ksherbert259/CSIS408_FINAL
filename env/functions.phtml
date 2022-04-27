@@ -78,7 +78,6 @@ function DB_Search($table, $data)
 {
   global $DB;
   $record = array();
-  // 'testuser'
 
   // Retrieve an indexed list of all tables
   $all_tables = json_decode(DB_TABLES);
@@ -100,7 +99,6 @@ function DB_Search($table, $data)
   $columns = rtrim($columns, ', ');
 
   $query = '';
-  // $query .= 'SELECT ' . $columns . ' FROM ' . $table . ' WHERE';
   $query .= 'SELECT * FROM ' . $table . ' WHERE';
   foreach($data as $column => $value)
   {
@@ -112,7 +110,7 @@ function DB_Search($table, $data)
 
   $rows = array();
   $result = $DB->query($query);
-  while($row = $result->fetch_row())
+  while($row = $result->fetch_array(MYSQLI_ASSOC))
   {
     $rows[] = $row;
   }

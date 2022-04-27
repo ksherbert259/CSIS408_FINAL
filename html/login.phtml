@@ -1,6 +1,15 @@
 <?
 
   require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
+  
+  // Redirect the user to the appropriate landing page
+  if(isset($_SESSION['USER_ID']))
+  {
+    echo 'You are currently logged in as "' . $_SESSION['USER_ARRAY']['full_name'] . '"<br>' . "\n";
+    echo 'This account is a ' . $_SESSION['USER_TYPE'] . '<br>' . "\n";
+    // header('Location: ' . PROJECT_HTML . '/' . $_SESSION['USER_TYPE'] . '/index.phtml');
+    // exit;
+  }
 
   // Get the variable names
   $xTASK = PostVar('xTASK', '');
@@ -45,8 +54,8 @@
       $_SESSION['USER_ARRAY'] = $user[0];
       $_SESSION['USER_ID'] = $user[0]['id'];
       $_SESSION['USER_TYPE'] = $acc_type;
-      header('Location: ' . PROJECT_HTML . '/' . $acc_type . '/index.phtml');
-      exit;
+      // header('Location: ' . PROJECT_HTML . '/' . $acc_type . '/index.phtml');
+      // exit;
     }
   }
 
@@ -68,7 +77,14 @@
       // Verify the username is not empty
       if(theform.xUSERNAME.value === '')
       {
-        console.log("Username sucks");
+        console.log("The username cannot be empty.");
+        break;
+      }
+
+      if(theform.xPASSWORD.value === '')
+      {
+        console.log("The password cannot be empty");
+        break;
       }
 
       okay = true;
