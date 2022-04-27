@@ -1,0 +1,45 @@
+<?php
+
+require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
+
+$tbl_users = new users;
+$_SESSION['USER_ARRAY'] = $tbl_users->Normalize();
+$_SESSION['USER_ID'] = '';
+$_SESSION['USER_TYPE'] = '';
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Logout | Social 02</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="../library/css/bootstrap.min.css">
+<style></style>
+<script>
+  function StartUp()
+  {
+    window.setTimeout(RedirectUser, 5000);
+  }
+
+  function RedirectUser()
+  {
+    window.location.href="<?php echo WEB_ROOT . '/html/login.phtml'; ?>";
+  }
+</script>
+<body onLoad="StartUp();">
+<?php
+  echo BuildNavigation();
+?>
+  <div class="container">
+    <div class="row">
+      <div class="col-1"></div>
+      <div class="col-10 debug">
+        <div class="pt-5 text-center">
+          <h5>You are currently being logged out. This webpage will redirect in 5 seconds!</h1>
+        </div>
+      </div>
+      <div class="col-1"></div>
+    </div>
+  </div>
+</body>
+</html>

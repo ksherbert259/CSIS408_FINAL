@@ -1,37 +1,39 @@
 <?
 
   require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
-  
+
   // Redirect the user to the appropriate landing page
-  if(isset($_SESSION['USER_ID']))
+  if($myACCOUNT['id'] !== '')
   {
-    echo 'You are currently logged in as "' . $_SESSION['USER_ARRAY']['full_name'] . '"<br>' . "\n";
-    echo 'This account is a ' . $_SESSION['USER_TYPE'] . '<br>' . "\n";
-    // header('Location: ' . PROJECT_HTML . '/' . $_SESSION['USER_TYPE'] . '/index.phtml');
-    // exit;
+    // echo 'You are currently logged in as "' . $myACCOUNT['full_name'] . '"<br>' . "\n";
+    // echo 'This account is a "' . $myACCOUNT_TYPE . '"<br>' . "\n";
+    HeaderLocation(WEB_ROOT . '/html/' . $myACCOUNT_TYPE . '/index.phtml');
+    exit;
   }
 
   // Get the variable names
   $xTASK = PostVar('xTASK', '');
   $xUSERNAME = PostVar('xUSERNAME', '');
   $xPASSWORD = PostVar('xPASSWORD', '');
-  $xFULLNAME = PostVar('xFULLNAME', '');
-
-  // Redirect the user to the appropriate landing page
-  if(isset($_SESSION['USER_ID']))
-  {
-    echo 'You are currently logged in as "' . $_SESSION['USER_ARRAY']['full_name'] . '"<br>' . "\n";
-    echo 'This account is a ' . $_SESSION['USER_TYPE'] . '<br>' . "\n";
-    // header('Location: ' . PROJECT_HTML . '/' . $_SESSION['USER_TYPE'] . '/index.phtml');
-    // exit;
-  }
 
   // Sanitize the input
   if($xTASK === 'LOGIN')
   {
-    if(preg_match("[^A-Za-z0-9]", $xUSERNAME) || strlen($xUSERNAME) > 64) {
-      // TODO Error
+    do
+    {
+      $xTASK_HOLD = $xTASK;
+      $xTASK = '';
+
+      $fail = (preg_match("[^A-Za-z0-9]", $xUSERNAME) || strlen($xUSERNAME) > 64);
+      if($fail) {
+        echo 'The username does not pass validation. Please ensure it is alphanumeric and less than 64 characters.';
+        break;
+        // TODO Error
+      }
+
+      $xTASK = $xTASK_HOLD;
     }
+    while(0);
   }
 
   $USER = array();
@@ -50,12 +52,14 @@
     }
     else
     {
-      $acc_type = ($user[0]['is_admin'] === 0) ? 'users' : 'administrators';
+      $acc_type = ($user[0]['is_admin']) ? 'administrators' : 'users';
       $_SESSION['USER_ARRAY'] = $user[0];
       $_SESSION['USER_ID'] = $user[0]['id'];
       $_SESSION['USER_TYPE'] = $acc_type;
-      // header('Location: ' . PROJECT_HTML . '/' . $acc_type . '/index.phtml');
-      // exit;
+      // echo 'Success! You have set the $_SESSION user variables<br>' . "\n";
+      echo WEB_ROOT . '/html/' . $acc_type . '/index.phtml';
+      HeaderLocation(WEB_ROOT . '/html/' . $acc_type . '/index.phtml');
+      exit;
     }
   }
 
@@ -63,9 +67,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <meta charset="UTF-8">
-<title>Page Title</title>
+<title>Login | Social 02</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="">
+<link rel="stylesheet" href="../library/css/bootstrap.min.css">
 <style>
 </style>
 <script>
@@ -83,7 +87,7 @@
 
       if(theform.xPASSWORD.value === '')
       {
-        console.log("The password cannot be empty");
+        console.log("The password cannot be empty.");
         break;
       }
 
@@ -101,19 +105,35 @@
 
 </script>
 <body>
-  <form name="xFORM" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
-  <div class="mb-3 mt-3">
-    <input type="hidden" name="xTASK" value="">
-    <label for="xUSERNAME">Username</label>
+<?php
+  echo BuildNavigation();
+?>
+  <div class="container">
+    <div class="row">
+      <div class="col-1"></div>
+      <div class="col-10 debug">
+        <div class="border-2 rounded-3 px-3 pt-5">
+          <div>
+            <h5 class="text-center">Please sign in with your <bold><em>Social 02</em></bold> Username and Password</h5>
+          </div>
+          <form name="xFORM" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data" class="px-5 pt-5">
+            <input type="hidden" name="xTASK" value="">
+            <div class="mb-3 mt-3">
+              <label for="xUSERNAME" class="form-label">Username</label>
+              <input type="text" id="xUSERNAME" name="xUSERNAME" class="form-control">
+            </div>
+            <div class="mb-3 mt-3">
+              <label for="xPASSWORD" class="form-label">Password</label>
+              <input type="password" id="xPASSWORD" name="xPASSWORD" class="form-control">
+            </div>
+            <div class="col-auto">
+              <button onclick="Validate(document.xFORM, 'LOGIN')" class="btn btn-primary mb-3">Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-1"></div>
+    </div>
   </div>
-    <input type="text" id="xUSERNAME" name="xUSERNAME"><br>
-    <label for="xFULLNAME">Full Name</label>
-    <input type="text" id="xFULLNAME" name="xFULLNAME"><br>
-    <label for="xPASSWORD">Password</label>
-    <input type="password" id="xPASSWORD" name="xPASSWORD"><br>
-    <label for="xPROFILEPICTURE">Upload a Profile Picture</label>
-    <input type="file" id="xPROFILEPICTURE" name="xPROFILEPICTURE"><br>
-    <button onclick="Validate(document.xFORM, 'LOGIN')">
-  </form>
 </body>
 </html>

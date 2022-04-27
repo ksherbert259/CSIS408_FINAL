@@ -15,7 +15,7 @@
   {
     echo 'You are currently logged in as "' . $_SESSION['USER_ARRAY']['full_name'] . '"<br>' . "\n";
     echo 'This account is a ' . $_SESSION['USER_TYPE'] . '<br>' . "\n";
-    // header('Location: ' . PROJECT_HTML . '/' . $_SESSION['USER_TYPE'] . '/index.phtml');
+    // HeaderLocation(PROJECT_HTML . '/' . $_SESSION['USER_TYPE'] . '/index.phtml');
     // exit;
   }
 
@@ -48,11 +48,11 @@
 
     if($okay)
     {
-      $acc_type = ($user[0]['is_admin'] === 0) ? 'users' : 'administrators';
+      $acc_type = ($user[0]['is_admin']) ? 'administrators' : 'users';
       $_SESSION['USER_ARRAY'] = $user[0];
       $_SESSION['USER_ID'] = $user[0]['id'];
       $_SESSION['USER_TYPE'] = $acc_type;
-      header('Location: ' . PROJECT_HTML . '/' . $acc_type . '/index.phtml');
+      HeaderLocation(PROJECT_HTML . '/' . $acc_type . '/index.phtml');
       exit;
     }
   }

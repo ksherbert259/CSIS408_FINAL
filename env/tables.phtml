@@ -16,7 +16,7 @@ class users {
     $fields['status'] = (array_key_exists('status', $data)) ? $data['status'] : '';
     $fields['is_deleted'] = (array_key_exists('is_deleted', $data)) ? $data['is_deleted'] : '';
 
-    return $data;
+    return $fields;
   }
 
   function CreateTable() {
