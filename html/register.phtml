@@ -29,22 +29,49 @@
   }
 
   $USER = array();
+  $IMAGE = array();
   if($xTASK === 'REGISTER')
   {
-    $USER['username'] = $xUSERNAME;
-    $USER['password'] = $xPASSWORD;
-    $USER['fullname'] = $xFULLNAME;
-    $USER['is_admin'] = $xISADMIN;
-    $USER['status'] = '';
-    $USER['is_deleted'] = 0;
-
-    // Search for the user with the given username and password
-    $okay = DB_Insert('users', $USER);
-    if(!$okay)
+    do
     {
-      echo 'Failed to insert the new record. ';
-      // echo $DB->error_get_last();
+      // Insert Image if found
+      $new_id = NULL;
+      if($xPROFILEPICTURE['error'] !== UPLOAD_ERR_NO_FILE && (file_exists($xPROFILE)))
+      {
+        $img_data = @file_get_contents($xPROFILEPICTURE['tmp_name']);
+        $IMAGE['image_type'] = $xPROFILEPICTURE['type'];
+        $IMAGE['image_data'] = $img_data;
+        $new_id = DB_Insert('images', $IMAGE);
+        
+        // Ensure the insert is successful
+        $okay = (is_bool($new_id) && ($new_id > 0));
+        if(!$okay)
+        {
+          echo 'Failed to upload the user image. ';
+          echo $DB->error_get_last();
+          break;
+        }
+      }
+  
+      // Update User Information
+      $USER['username'] = $xUSERNAME;
+      $USER['password'] = $xPASSWORD;
+      $USER['full_name'] = $xFULLNAME;
+      $USER['is_admin'] = $xISADMIN;
+      $USER['image_id'] = $new_id; // Some image ID
+      $USER['status'] = '';
+      $USER['is_deleted'] = 0;
+  
+      // Search for the user with the given username and password
+      $okay = DB_Insert('users', $USER);
+      if(!$okay)
+      {
+        echo 'Failed to create the new user. ';
+        echo $DB->error_get_last();
+        break;
+      }
     }
+    while(0);
 
     if($okay)
     {
@@ -52,7 +79,7 @@
       $_SESSION['USER_ARRAY'] = $user[0];
       $_SESSION['USER_ID'] = $user[0]['id'];
       $_SESSION['USER_TYPE'] = $acc_type;
-      HeaderLocation(PROJECT_HTML . '/' . $acc_type . '/index.phtml');
+      HeaderLocation(WEB_ROOT . '/html/' . $acc_type . '/index.phtml');
       exit;
     }
   }
@@ -63,7 +90,8 @@
 <meta charset="UTF-8">
 <title>Register Account | Social 02</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/main.css">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/bootstrap.min.css">
 <style>
 </style>
 <script>
@@ -92,17 +120,48 @@
 
 </script>
 <body>
-  <form name="xFORM" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
-    <input type="hidden" name="xTASK" value="">
-    <label for="xUSERNAME">Username</label>
-    <input type="text" id="xUSERNAME" name="xUSERNAME"><br>
-    <label for="xFULLNAME">Full Name</label>
-    <input type="text" id="xFULLNAME" name="xFULLNAME"><br>
-    <label for="xPASSWORD">Password</label>
-    <input type="password" id="xPASSWORD" name="xPASSWORD"><br>
-    <label for="xPROFILEPICTURE">Upload a Profile Picture</label>
-    <input type="file" id="xPROFILEPICTURE" name="xPROFILEPICTURE"><br>
-    <button onclick="Validate(document.xFORM, 'REGISTER')">
-  </form>
+<div class="container">
+  <div class="row">
+    <div class="col-1"></div>
+    <div class="col-10 debug">
+      <div class="border-2 rounded-3 px-3 pt-5">
+        <div>
+          <h5 class="text-center">Create your <bold><em>Social 02</em></bold> Account</h5>
+        </div>
+        <form name="xFORM" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data" class="px-5 pt-5">
+          <input type="hidden" name="xTASK" value="">
+          <div class="mb-3 mt-3">
+            <label for="xUSERNAME" class="form-label">Username</label>
+            <input type="text" id="xUSERNAME" name="xUSERNAME" class="form-control">
+          </div>
+          <div class="mb-3 mt-3">
+            <label for="xPASSWORD" class="form-label">Password</label>
+            <input type="password" id="xPASSWORD" name="xPASSWORD" class="form-control">
+          </div>
+          <div class="mb-3 mt-3">
+            <label for="xFULLNAME" class="form-label">Full Name</label>
+            <input type="text" id="xFULLNAME" name="xFULLNAME" class="form-control">
+          </div>
+          <div class="mb-3 mt-3">
+            <label for="xEMAIL" class="form-label">Email Address</label>
+            <input type="email" id="xEMAIL" name="xEMAIL" class="form-control">
+          </div>
+          <div class="mb-3 mt-3">
+            <label for="xIMAGE" class="form-label">Profile Picture</label>
+            <input type="file" id="xIMAGE" name="xIMAGE" class="form-control-file">
+          </div>
+          <div class="mb-3 mt-3">
+            <input type="checkbox" id="xISADMIN" name="xISADMIN" class="form-check-input" value="1">
+            <label for="xISADMIN" class="form-check-label">Request Administrator</label>
+          </div>
+          <div class="col-auto">
+            <button onclick="Validate(document.xFORM, 'REGISTER')" class="btn btn-primary mb-3">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="col-1"></div>
+  </div>
+</div>
 </body>
 </html>

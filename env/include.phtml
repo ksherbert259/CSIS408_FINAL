@@ -15,7 +15,8 @@
   require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/functions.phtml';
 
   // Get last modification of the requested file -- Debug to ensure successful FTP deploy.
-  echo "Last modified: " . date("F d Y H:i:s.", getlastmod()) . "\n";
+  echo "Last modified: " . date("F d Y H:i:s.", getlastmod()) . '<br>' . "\n";
+  echo "Current User: " . $myACCOUNT['full_name'] . ' - UID: ' . $myACCOUNT['id'] . '<br>' . "\n";
 
   header('Cache-Control: no-cache');
   header('Pragma: no-cache');

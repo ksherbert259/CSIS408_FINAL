@@ -112,7 +112,7 @@ function BuildNavigation($page = '')
 function DB_Insert($table, $data)
 {
   global $DB;
-  $success = false;
+  $new_id = 0;
 
   // Retrieve an indexed list of all tables
   $all_tables = json_decode(DB_TABLES);
@@ -125,28 +125,42 @@ function DB_Insert($table, $data)
     echo 'Failed to find a valid table. - ' . $table . "\n";
   }
 
-  // SQL Format. Follow this : KSH : 04/25/2022
   // INSERT INTO *tbl_name* (col1, col2, col3, col4) VALUES (val1, val2, val3, val4);
   $query = '';
 
-  $query = '';
-  $query .= 'INSERT INTO ' . $table . ' VALUES(';
+  // Build ^INSERT INTO *tbl_name* (col1, col2, col3)
+  $query .= 'INSERT INTO ' . $table . ' (';
   foreach($data as $column => $value)
   {
-    $query .= $column . ' = \'' . $value . '\',';
+    $query .= $column . ', ';
   }
+  $query = rtrim($query, ', ');
 
-  $query = rtrim($query, ',');
-  $query .= ' INTO ' . $table;
+  // Build ^ VALUES (val1, val2, val3)
+  $query .= ') VALUES (';
+  foreach($data as $column => $value)
+  {
+    $query .= '\'' . $value . '\', ';
+  }
+  $query = rtrim($query, ', ');
+  $query .= ')';
 
-  $okay = $DB->query($query);
+  // Run the built query
+  $result = $DB->query($query);
+  $okay = ($result !== false);
   if(!$okay)
   {
     echo 'Failed to insert the query with table - ' . $table . "\n";
-    echo 'Query : ' . $query . "\n";;
+    echo 'Query : ' . $query . "\n";
+    echo $DB->error_get_last();
   }
 
-  return $success;
+  // Set the newly created id as return
+  if($okay)
+  {
+    $new_id = $DB->insert_id;
+  }
+  return $new_id;
 }
 
 function DB_Search($table, $data)
@@ -190,5 +204,19 @@ function DB_Search($table, $data)
 
   return $rows;
 }
+
+// function DB_LoadImages($id = $myACCOUNT['id'])
+// {
+  
+//   if($id === '')
+//   {
+//     return false;
+//   }
+//   else
+//   {
+//     // Search for friends of $myACCOUNT?
+//     return false;
+//   }
+// }
 
 ?>
