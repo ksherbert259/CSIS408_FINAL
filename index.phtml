@@ -1,5 +1,9 @@
 <?php
 
-  // require_once '/csis408/social02/env/library.phtml';
+  require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
+
+  // Redirect the user to the home page for logging in
+  HeaderLocation(WEB_ROOT . '/html/login.phtml');
+  exit;
 
 ?>

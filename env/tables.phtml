@@ -1,0 +1,54 @@
+<?php
+
+class users {
+
+  function Normalize($data = array())
+  {
+    $fields = array();
+
+    $fields['id'] = (array_key_exists('id', $data)) ? $data['id'] : '';
+    $fields['full_name'] = (array_key_exists('full_name', $data)) ? $data['full_name'] : '';
+    $fields['username'] = (array_key_exists('username', $data)) ? $data['username'] : '';
+    $fields['password'] = (array_key_exists('password', $data)) ? $data['password'] : '';
+    $fields['is_admin'] = (array_key_exists('is_admin', $data)) ? $data['is_admin'] : '';
+    $fields['datetime_joined'] = (array_key_exists('datetime_joined', $data)) ? $data['datetime_joined'] : '';
+    $fields['profile_picture'] = (array_key_exists('profile_picture', $data)) ? $data['profile_picture'] : '';
+    $fields['status'] = (array_key_exists('status', $data)) ? $data['status'] : '';
+    $fields['is_deleted'] = (array_key_exists('is_deleted', $data)) ? $data['is_deleted'] : '';
+
+    return $fields;
+  }
+
+  function CreateTable() {
+    global $DB;
+
+    $sql = '';
+    $sql .= 'CREATE TABLE users (';
+    $sql .= 'id primary key int NOT NULL,';
+    $sql .= 'full_name VARCHAR(255),';
+    $sql .= ');';
+  }
+
+  function Insert($data) {
+    return false;
+  }
+}
+
+
+class comments {
+
+}
+
+class friendswith {
+
+}
+
+class posts {
+
+}
+
+class reactions {
+
+}
+
+?>

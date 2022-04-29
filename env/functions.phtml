@@ -11,17 +11,100 @@ function GetVar($name, $default)
   return $fix;
 }
 
-// Find the $_POST variable
-function PostVar($name, $default)
+// Find the $_POST array
+function PostVar($name, $default = '')
 {
-  $fix = (isset($_POST[$name])) ? $_POST[$name] : $default;
+  $fix = (array_key_exists($name, $_POST)) ? $_POST[$name] : $default;
+  return $fix;
+}
+
+// Find the $_POST variable
+function PostFile($name)
+{
+  $default = array('name' => '', 'type' => '', 'size' => 0, 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'full_path' => '');
+  $fix = (isset($_FILES[$name])) ? $_FILES[$name] : $default;
   return $fix;
 }
 
 // Redirect the header
-function RedirectHeader($location)
+function HeaderLocation($location)
 {
   Header('Location: ' . $location);
+}
+
+// Build the site navigation by user
+function BuildNavigation($page = '')
+{
+  global $myACCOUNT_TYPE;
+
+  $navigation = '';
+  $navigation .= '<nav class="navbar navbar-expand-lg navbar-light bg-light">';
+  $navigation .= '  <div class="container-fluid">';
+  $navigation .= '    <a class="navbar-brand" href="#">Social 02</a>';
+  $navigation .= '    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">';
+  $navigation .= '      <span class="navbar-toggler-icon"></span>';
+  $navigation .= '    </button>';
+  $navigation .= '    <div class="collapse navbar-collapse" id="navbarSupportedContent">';
+
+  // Only allow certain elements if user is logged in
+  if($myACCOUNT_TYPE !== '')
+  {
+    $navigation .= '      <ul class="navbar-nav me-auto mb-2 mb-lg-0">';
+    $navigation .= '        <li class="nav-item">';
+    $navigation .= '          <a class="nav-link active" aria-current="fake" href="' . WEB_ROOT . '/html/' . $myACCOUNT_TYPE . '/index.phtml">Feed</a>';
+    $navigation .= '        </li>';
+    $navigation .= '        <li class="nav-item">';
+    $navigation .= '          <a class="nav-link" href="#">Profile</a>';
+    $navigation .= '        </li>';
+    $navigation .= '        <li class="nav-item">';
+    $navigation .= '          <a class="nav-link" href="#">Friends</a>';
+    $navigation .= '        </li>';
+
+    // Disabled
+    $navigation .= '        <li class="nav-item">';
+    $navigation .= '          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>';
+    $navigation .= '        </li>';
+
+    // Dropdown
+    $navigation .= '        <li class="nav-item dropdown">';
+    $navigation .= '          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">';
+    $navigation .= '            Dropdown';
+    $navigation .= '          </a>';
+    $navigation .= '          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">';
+    $navigation .= '            <li><a class="dropdown-item" href="#">Action</a></li>';
+    $navigation .= '            <li><a class="dropdown-item" href="#">Another action</a></li>';
+    $navigation .= '            <li><hr class="dropdown-divider"></li>';
+    $navigation .= '            <li><a class="dropdown-item" href="#">Something else here</a></li>';
+    $navigation .= '          </ul>';
+    $navigation .= '        </li>';
+    $navigation .= '      </ul>';
+
+    $navigation .= '      <ul class="navbar-nav">';
+    $navigation .= '        <li class="nav-item me-3">';
+    $navigation .= '          <a class="btn btn-primary" href="' . WEB_ROOT . '/html/logout.phtml">Logout</a>';
+    $navigation .= '        </li>';
+
+    $navigation .= '      <form class="d-flex">'; // Configure this to POST to unique page for Searching by Usernames
+    $navigation .= '        <input name="xUSERNAME" class="form-control me-2" type="search" placeholder="Search @username" aria-label="Search">';
+    $navigation .= '        <button class="btn btn-outline-success" type="submit">Search</button>';
+    $navigation .= '      </form>';
+    $navigation .= '      </ul>';
+
+  }
+  else
+  {
+    $navigation .= '      <ul class="navbar-nav me-auto mb-2 mb-lg-0">';
+    $navigation .= '        <li class="nav-item">';
+    $navigation .= '          <a class="nav-link active" aria-current="page" href="#">Login</a>';
+    $navigation .= '        </li>';
+    $navigation .= '      </ul>';
+  }
+
+  $navigation .= '    </div>';
+  $navigation .= '  </div>';
+  $navigation .= '</nav>';
+
+  return $navigation;
 }
 
 
@@ -29,7 +112,7 @@ function RedirectHeader($location)
 function DB_Insert($table, $data)
 {
   global $DB;
-  $success = false;
+  $new_id = 0;
 
   // Retrieve an indexed list of all tables
   $all_tables = json_decode(DB_TABLES);
@@ -39,17 +122,101 @@ function DB_Insert($table, $data)
   $okay = (array_key_exists($table, $all_tables));
   if(!$okay)
   {
-    echo 'Failed to find a valid table. - ' . $table;
+    echo 'Failed to find a valid table. - ' . $table . "\n";
   }
 
+  // INSERT INTO *tbl_name* (col1, col2, col3, col4) VALUES (val1, val2, val3, val4);
   $query = '';
-  foreach($data as $idx => $value)
+
+  // Build ^INSERT INTO *tbl_name* (col1, col2, col3)
+  $query .= 'INSERT INTO ' . $table . ' (';
+  foreach($data as $column => $value)
   {
-    $query .= $idx . ' = ' . $value;
+    $query .= $column . ', ';
+  }
+  $query = rtrim($query, ', ');
+
+  // Build ^ VALUES (val1, val2, val3)
+  $query .= ') VALUES (';
+  foreach($data as $column => $value)
+  {
+    $query .= '\'' . $value . '\', ';
+  }
+  $query = rtrim($query, ', ');
+  $query .= ')';
+
+  // Run the built query
+  $result = $DB->query($query);
+  $okay = ($result !== false);
+  if(!$okay)
+  {
+    echo 'Failed to insert the query with table - ' . $table . "\n";
+    echo 'Query : ' . $query . "\n";
+    echo $DB->error_get_last();
   }
 
-  return $success;
+  // Set the newly created id as return
+  if($okay)
+  {
+    $new_id = $DB->insert_id;
+  }
+  return $new_id;
 }
 
+function DB_Search($table, $data)
+{
+  global $DB;
+  $record = array();
+
+  // Retrieve an indexed list of all tables
+  $all_tables = json_decode(DB_TABLES);
+  $all_tables = array_flip($all_tables);
+
+  // Check if the given table exists
+  $okay = (array_key_exists($table, $all_tables));
+  if(!$okay)
+  {
+    echo 'Failed to find a valid table. - ' . $table . "\n";
+  }
+
+  // Find the used columns
+  $columns = '';
+  foreach($data as $column => $value)
+  {
+    $columns .= $column . ', ';
+  }
+  $columns = rtrim($columns, ', ');
+
+  $query = '';
+  $query .= 'SELECT * FROM ' . $table . ' WHERE';
+  foreach($data as $column => $value)
+  {
+    $query .= ' ' . $column . ' = \'' . $value . '\' AND';
+  }
+  $query = rtrim($query, ' AND');
+
+  $rows = array();
+  $result = $DB->query($query);
+  while($row = $result->fetch_array(MYSQLI_ASSOC))
+  {
+    $rows[] = $row;
+  }
+
+  return $rows;
+}
+
+// function DB_LoadImages($id = $myACCOUNT['id'])
+// {
+  
+//   if($id === '')
+//   {
+//     return false;
+//   }
+//   else
+//   {
+//     // Search for friends of $myACCOUNT?
+//     return false;
+//   }
+// }
 
 ?>

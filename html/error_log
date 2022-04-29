@@ -1,0 +1,4 @@
+[25-Apr-2022 12:54:11 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function PostVar() in /home/jwestfal/drwestfall.us/spring_2022/csis408/social02/html/login.phtml:6
+Stack trace:
+#0 {main}
+  thrown in /home/jwestfal/drwestfall.us/spring_2022/csis408/social02/html/login.phtml on line 6
