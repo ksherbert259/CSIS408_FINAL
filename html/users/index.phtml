@@ -30,7 +30,7 @@
       <div class="col-10 debug">
         <div class="border-2 rounded-3 px-3 pt-5">
 <?php
-$sql = "SELECT u.full_name, u.image_id AS user_image_id, u.is_deleted AS user_is_deleted, p.id, p.text, p.user_id, p.image_id, p.datetime_add, p.is_deleted FROM posts p LEFT JOIN users u ON u.id = p.user_id LEFT JOIN friendswith fw ON fw.user1_id = p.user_id OR fw.user2_id = p.user_id WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " OR fw.user2_id = " . $_SESSION['USER_ID'] . ") AND p.user_id != " . $_SESSION['USER_ID'] . " ORDER BY p.datetime_add DESC";
+$sql = "SELECT u.full_name, u.image_id AS user_image_id, u.is_deleted AS user_is_deleted, p.id, p.text, p.user_id, p.image_id, p.datetime_add, p.is_deleted FROM posts p LEFT JOIN users u ON u.id = p.user_id LEFT JOIN friendswith fw ON fw.user1_id = p.user_id OR fw.user2_id = p.user_id WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " OR fw.user2_id = " . $_SESSION['USER_ID'] . ") ORDER BY p.datetime_add DESC";
 if($result = mysqli_query($DB, $sql)){
   if(mysqli_num_rows($result) > 0){
     while($row = mysqli_fetch_array($result)){
