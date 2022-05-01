@@ -30,19 +30,19 @@
       <div class="col-10 debug">
         <div class="border-2 rounded-3 px-3 pt-5">
 <?php
-$sql = "SELECT u.full_name, u.image_id AS user_image_id, u.is_deleted AS user_is_deleted, p.id, p.text, p.user_id, p.image_id, p.datetime_add, p.is_deleted FROM posts p LEFT JOIN users u ON u.id = p.user_id LEFT JOIN friendswith fw ON fw.user1_id = p.user_id OR fw.user2_id = p.user_id WHERE (fw.user1_id = 1 OR fw.user2_id = 1) AND p.user_id != 1 ORDER BY p.datetime_add DESC";
+$sql = "SELECT u.full_name, u.image_id AS user_image_id, u.is_deleted AS user_is_deleted, p.id, p.text, p.user_id, p.image_id, p.datetime_add, p.is_deleted FROM posts p LEFT JOIN users u ON u.id = p.user_id LEFT JOIN friendswith fw ON fw.user1_id = p.user_id OR fw.user2_id = p.user_id WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " OR fw.user2_id = " . $_SESSION['USER_ID'] . ") AND p.user_id != " . $_SESSION['USER_ID'] . " ORDER BY p.datetime_add DESC";
 if($result = mysqli_query($DB, $sql)){
   if(mysqli_num_rows($result) > 0){
     while($row = mysqli_fetch_array($result)){
-      echo "<div class=post>";
+      echo "<div class=post id=post" . $row['id'] . ">";
       // TODO Fix profile picture display
       echo "Test 1";
-      if(!is_null($result['user_image_id'])){
+      if(!is_null($row['user_image_id'])){
         echo '<img src="' . WEB_ROOT . '/env/image_get.phtml?image_id=' . $row['user_image_id'] . '"/>';
         echo "there's supposed to be an image here";
       }
 
-      echo $result['user_image_type'];
+      echo $row['user_image_type'];
 
       echo "<div class=username>" . $row['full_name'] . "</div>";
       echo "<p class=caption>" . $row['text'] . "</p>";
