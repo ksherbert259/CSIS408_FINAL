@@ -30,12 +30,29 @@ img {
   max-height: 250px;
 }
 
-
+.post {
+  margin-bottom: 30px;
+  background-color: #333;
+  border-radius: 10px;
+  padding: 20px;
+}
 
 .username {
-  color: #00AAFF;
+  color: #ccc;
+  margin-bottom: 10px;
+}
+
+.caption {
+  color: white;
+  margin-bottom: 15px;
+  line-height: 120%;
+}
+
+.datetime {
+  color: #999;
+  font-size: 0.8em;
 }
 
 .reactions {
-  color: #FF3333;
+  color: #aaa;
 }
