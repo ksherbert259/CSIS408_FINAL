@@ -26,7 +26,7 @@
 
       $fail = (preg_match("[^A-Za-z0-9]", $xUSERNAME) || strlen($xUSERNAME) > 64);
       if($fail) {
-        echo 'The username does not pass validation. Please ensure it is alphanumeric and less than 64 characters.';
+        $DEBUG_MESSAGE = 'The username does not pass validation. Please ensure it is alphanumeric and less than 64 characters.';
         break;
         // TODO Error
       }
@@ -48,7 +48,7 @@
     // Make sure only 1 record is returned
     if(count($user) !== 1)
     {
-      echo 'Could not find matching username and password.';
+      $DEBUG_MESSAGE = 'Could not find matching username and password.';
     }
     else
     {
@@ -69,7 +69,8 @@
 <meta charset="UTF-8">
 <title>Login | Social 02</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="../library/css/bootstrap.min.css">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/main.css">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/bootstrap.min.css">
 <style>
 </style>
 <script>
@@ -81,13 +82,14 @@
       // Verify the username is not empty
       if(theform.xUSERNAME.value === '')
       {
-        console.log("The username cannot be empty.");
+        console.log("Please ensure the username is not empty!");
         break;
       }
 
+      // Verify the password is not empty
       if(theform.xPASSWORD.value === '')
       {
-        console.log("The password cannot be empty.");
+        console.log("Please ensure the password is not empty!");
         break;
       }
 
@@ -101,6 +103,8 @@
       theform.xTASK.value = thetask;
       theform.submit();
     }
+
+    return false;
   }
 
 </script>
@@ -109,6 +113,15 @@
   echo BuildNavigation();
 ?>
   <div class="container">
+    <div class="row">
+      <div class="col-12 text-center px-3 pt-5 DEBUG_MESSAGE">
+        <p>
+<?php
+  echo $DEBUG_MESSAGE;
+?>
+        </p>
+      </div>
+    </div>
     <div class="row">
       <div class="col-1"></div>
       <div class="col-10 debug">
@@ -120,11 +133,11 @@
             <input type="hidden" name="xTASK" value="">
             <div class="mb-3 mt-3">
               <label for="xUSERNAME" class="form-label">Username</label>
-              <input type="text" id="xUSERNAME" name="xUSERNAME" class="form-control">
+              <input type="text" id="xUSERNAME" name="xUSERNAME" class="form-control" value="<?php echo $xUSERNAME; ?>">
             </div>
             <div class="mb-3 mt-3">
               <label for="xPASSWORD" class="form-label">Password</label>
-              <input type="password" id="xPASSWORD" name="xPASSWORD" class="form-control">
+              <input type="password" id="xPASSWORD" name="xPASSWORD" class="form-control" value="<?php echo $xPASSWORD; ?>">
             </div>
             <div class="col-auto">
               <button onclick="Validate(document.xFORM, 'LOGIN')" class="btn btn-primary mb-3">Login</button>

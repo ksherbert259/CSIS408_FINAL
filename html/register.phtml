@@ -11,21 +11,66 @@
   $xPROFILEPICTURE = PostFile('xPROFILEPICTURE');
 
   // Redirect the user to the appropriate landing page
-  if(isset($_SESSION['USER_ID']))
+  // if($myACCOUNT['id'] !== '')
   {
-    echo 'You are currently logged in as "' . $_SESSION['USER_ARRAY']['full_name'] . '"<br>' . "\n";
-    echo 'This account is a ' . $_SESSION['USER_TYPE'] . '<br>' . "\n";
-    // HeaderLocation(PROJECT_HTML . '/' . $_SESSION['USER_TYPE'] . '/index.phtml');
+    echo 'You are currently logged in as "' . $myACCOUNT['full_name'] . '"<br>' . "\n";
+    echo 'This account is a ' . $myACCOUNT_TYPE . '<br>' . "\n";
+    // HeaderLocation(WEB_ROOT . '/html/' . $myACCOUNT_TYPE . '/index.phtml');
     // exit;
   }
 
   // Sanitize the input
   if($xTASK === 'REGISTER')
   {
-    if(preg_match("[^A-Za-z0-9]", $xUSERNAME) || strlen($xUSERNAME) > 64) {
-      // TODO Error
-    }
+    $xTASK_HOLD = $xTASK;
+    $xTASK = '';
 
+    $okay = false;
+    do
+    {
+      // Ensure the username passes validation
+      if(preg_match("[^A-Za-z0-9]", $xUSERNAME) || strlen($xUSERNAME) > 64) {
+        $DEBUG_MESSAGE = 'The username has not passed verification. Please ensure the username is alphanumeric and less than 64 characters';
+        break;
+      }
+
+      // Ensure the password passes validation
+      if(preg_match("[^A-Za-z0-9]", $xPASSWORD) || strlen($xPASSWORD) > 64) {
+        $DEBUG_MESSAGE = 'The password has not passed verification. Please ensure the username is alphanumeric and less than 64 characters';
+        break;
+      }
+
+      // Ensure the ISADMIN button is safe.
+      $okay = ($xISADMIN === '1') || ($xISADMIN === '0');
+      if(!$okay)
+      {
+        $DEBUG_MESSAGE = 'The Administrator Request button has been fiddled with!';
+        break;
+      }
+
+      // Make sure the username is fully unique
+      $tmp_user = array();
+      $tmp_user['username'] = $xUSERNAME;
+      $return = DB_Search('users', $tmp_user);
+
+      $okay = (count($return) === 0);
+      unset($return, $tmp_user);
+      if(!$okay)
+      {
+        $DEBUG_MESSAGE = 'The username is already in use. Please try another.';
+        break;
+      }
+
+      $okay = true;
+    }
+    while(0);
+
+    // Reset the $xTASK to the original value
+    if($okay)
+    {
+      $xTASK = $xTASK_HOLD;
+      unset($xTASK_HOLD);
+    }
   }
 
   $USER = array();
@@ -42,7 +87,7 @@
         $IMAGE['image_type'] = $xPROFILEPICTURE['type'];
         $IMAGE['image_data'] = $img_data;
         $new_id = DB_Insert('images', $IMAGE);
-        
+
         // Ensure the insert is successful
         $okay = (is_bool($new_id) && ($new_id > 0));
         if(!$okay)
@@ -52,7 +97,7 @@
           break;
         }
       }
-  
+
       // Update User Information
       $USER['username'] = $xUSERNAME;
       $USER['password'] = $xPASSWORD;
@@ -61,7 +106,7 @@
       $USER['image_id'] = $new_id; // Some image ID
       $USER['status'] = '';
       $USER['is_deleted'] = 0;
-  
+
       // Search for the user with the given username and password
       $okay = DB_Insert('users', $USER);
       if(!$okay)
@@ -75,7 +120,7 @@
 
     if($okay)
     {
-      $acc_type = ($user[0]['is_admin']) ? 'administrators' : 'users';
+      $acc_type = ($user[0]['is_admin'] === '1') ? 'administrators' : 'users';
       $_SESSION['USER_ARRAY'] = $user[0];
       $_SESSION['USER_ID'] = $user[0]['id'];
       $_SESSION['USER_TYPE'] = $acc_type;
@@ -103,7 +148,22 @@
       // Verify the username is not empty
       if(theform.xUSERNAME.value === '')
       {
-        console.log("Username sucks");
+        console.log("Please ensure the username is not empty!");
+        break;
+      }
+
+      // Verify the password is not empty
+      if(theform.xPASSWORD.value === '')
+      {
+        console.log("Please ensure the password is not empty!");
+        break;
+      }
+
+      // Verify the full name is not empty
+      if(theform.xFULLNAME.value === '')
+      {
+        console.log("Please ensure the user's full name is not empty!");
+        break;
       }
 
       okay = true;
@@ -116,6 +176,8 @@
       theform.xTASK.value = thetask;
       theform.submit();
     }
+
+    return false;
   }
 
 </script>

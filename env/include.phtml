@@ -18,7 +18,10 @@
   echo "Last modified: " . date("F d Y H:i:s.", getlastmod()) . '<br>' . "\n";
   echo "Current User: " . $myACCOUNT['full_name'] . ' - UID: ' . $myACCOUNT['id'] . '<br>' . "\n";
 
-  header('Cache-Control: no-cache');
-  header('Pragma: no-cache');
+  // Get last modification of the requested file -- Debug to ensure successful FTP deploy.
+  if(1)
+  {
+    echo "Last modified: " . date("F d Y H:i:s.", getlastmod()) . "\n";
+  }
 
 ?>

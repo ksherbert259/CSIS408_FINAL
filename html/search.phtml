@@ -1,0 +1,139 @@
+<?php
+
+  require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
+
+  $USER = GetVar('USER', '');
+  $xUSER = PostVar('xUSER', $USER);
+
+  $all_users = array();
+  if($xUSER !== '')
+  {
+    $str_search = strtolower($xUSER);
+
+    // Initialize the search query
+    $query = 'SELECT * FROM users WHERE username LIKE \'%' . $str_search . '%\' OR username = \'' . $str_search . '\' OR full_name LIKE \'%' . $str_search .'%\'';
+
+    $all_users = array();
+    $result = $DB->query($query);
+    while($row = $result->fetch_array(MYSQLI_ASSOC))
+    {
+      $all_users[] = $row;
+    }
+
+    $all_image_ids = array();
+    foreach($all_users as $user)
+    {
+      if(($user['image_id'] === NULL) || ($user['image_id'] === 0))
+      {
+        continue;
+      }
+
+      // Add all valid ids to the list
+      $all_image_ids[] = $user['image_id'];
+    }
+
+    $query = 'SELECT * FROM images WHERE ';
+    foreach($all_image_ids as $id)
+    {
+      $query .= 'image_id = \'' . $id . '\' OR ';
+    }
+    $query = rtrim($query, ' OR ');
+
+    $all_images = array();
+    $result = $DB->query($query);
+    while($row = $result->fetch_array(MYSQLI_ASSOC))
+    {
+      $all_images[$row['image_id']] = $row;
+    }
+  }
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Searching for <?php echo $USER; ?> | Social 02</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/main.css">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/bootstrap.min.css">
+<style>
+</style>
+<script src=""></script>
+<body>
+<?php
+  echo BuildNavigation();
+?>
+  <div class="container">
+    <div class="mt-3 bg-light border-2 rounded-3">
+      <div class="row align-content-center align-middle">
+        <div class="col-3 border-bottom"></div>
+        <div class="col-6 border-bottom">
+          <div class="border-2 rounded-3 px-3 pt-5">
+            <form name="xSEARCH" class="d-flex" method="GET" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+              <input name="USER" class="form-control me-2" type="search" placeholder="Search @username" aria-label="Search" value="<?php echo $USER; ?>">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+        <div class="col-3 border-bottom"></div>
+      </div>
+      <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10 debug">
+          <div class="border-2 rounded-3 px-3 pt-5">
+<?php
+
+
+  $spaces = '          ';
+  if(count($all_users) > 0)
+  {
+    echo $spaces . '<div class="px-3 py-3">' . "\n";
+    echo '<div class="mb-2"><h4>Listing all users matching \'' . strtolower($USER) . '\'</h4><div>' . "\n";
+    echo '<table class="table table-striped">' . "\n";
+    echo '<tr><td>icon</td><td>Username</td></tr>' . "\n";
+
+    $row_cnt = 'bg-dark';
+    foreach($all_users as $cnt => $user)
+    {
+      $img_url = '';
+      $image = '';
+      $img_elem = '';
+      if(isset($all_images[$user['image_id']]))
+      {
+        $image = $all_images[$user['image_id']];
+        $img_url = 'data:' . $image['image_type'] . ';base64,' . $image['image_data'];
+        $img_elem = '<img src="data:' . $image['image_type'] . ';base64,' . $image['image_data'] . '" style="width:40px;" class="rounded-pill">';
+      }
+
+?>
+            <!-- <div class="my-1 border-2 rounded-3 d-flex align-content-center align-items-center align-baseline <?php echo $row_cnt; ?>"> -->
+                <tr>
+                  <td>
+                    <div class="profile px-2">
+                      <?php echo $img_elem; ?>
+                      <!-- <img src="<?php echo $img_url; ?>" style="width: 40px;" class="rounded-pill"> -->
+                    </div>
+                  </td>
+                  <td>
+                    <div class="username align-baseline">
+                      <p><?php echo $user['username']; ?></p>
+                    </div>
+                  </td>
+                </tr>
+            <!-- </div> -->
+<?php
+
+    }
+    echo $spaces . '</div>' . "\n";
+    echo $spaces . '</table>' . "\n";
+  }
+
+?>
+          </div>
+        </div>
+        </div>
+        <div class="col-1"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

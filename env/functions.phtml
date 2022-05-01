@@ -35,16 +35,20 @@ function HeaderLocation($location)
 // Build the site navigation by user
 function BuildNavigation($page = '')
 {
+  global $myACCOUNT;
   global $myACCOUNT_TYPE;
 
+  $welcome = ($myACCOUNT_TYPE !== '') ? ' | Welcome ' . ucwords($myACCOUNT['full_name']) . '!' : '';
+
   $navigation = '';
-  $navigation .= '<nav class="navbar navbar-expand-lg navbar-light bg-light">';
-  $navigation .= '  <div class="container-fluid">';
-  $navigation .= '    <a class="navbar-brand" href="#">Social 02</a>';
-  $navigation .= '    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">';
-  $navigation .= '      <span class="navbar-toggler-icon"></span>';
-  $navigation .= '    </button>';
-  $navigation .= '    <div class="collapse navbar-collapse" id="navbarSupportedContent">';
+  // add class "fixed-top" to navbar
+  $navigation .= '<nav class="navbar navbar-expand-lg navbar-dark bg-dark">' . "\n";
+  $navigation .= '  <div class="container-fluid">' . "\n";
+  $navigation .= '    <a class="navbar-brand" href="' . WEB_ROOT . '/html/login.phtml">Social 02' . $welcome . '</a>' . "\n";
+  $navigation .= '    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">' . "\n";
+  $navigation .= '      <span class="navbar-toggler-icon"></span>' . "\n";
+  $navigation .= '    </button>' . "\n";
+  $navigation .= '    <div class="collapse navbar-collapse" id="navbarSupportedContent">' . "\n";
 
   // Only allow certain elements if user is logged in
   if($myACCOUNT_TYPE !== '')
@@ -64,48 +68,52 @@ function BuildNavigation($page = '')
     $navigation .= '        </li>';
 
     // Disabled
-    $navigation .= '        <li class="nav-item">';
-    $navigation .= '          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>';
-    $navigation .= '        </li>';
+    // $navigation .= '        <li class="nav-item">' . "\n";
+    // $navigation .= '          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Welcome ' . $myACCOUNT['username'] . '!</a>' . "\n";
+    // $navigation .= '        </li>' . "\n";
 
-    // Dropdown
-    $navigation .= '        <li class="nav-item dropdown">';
-    $navigation .= '          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">';
-    $navigation .= '            Dropdown';
-    $navigation .= '          </a>';
-    $navigation .= '          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">';
-    $navigation .= '            <li><a class="dropdown-item" href="#">Action</a></li>';
-    $navigation .= '            <li><a class="dropdown-item" href="#">Another action</a></li>';
-    $navigation .= '            <li><hr class="dropdown-divider"></li>';
-    $navigation .= '            <li><a class="dropdown-item" href="#">Something else here</a></li>';
-    $navigation .= '          </ul>';
-    $navigation .= '        </li>';
-    $navigation .= '      </ul>';
+    // // Dropdown
+    // $navigation .= '        <li class="nav-item dropdown">' . "\n";
+    // $navigation .= '          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">' . "\n";
+    // $navigation .= '            Dropdown' . "\n";
+    // $navigation .= '          </a>' . "\n";
+    // $navigation .= '          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">' . "\n";
+    // $navigation .= '            <li><a class="dropdown-item" href="#">Action</a></li>' . "\n";
+    // $navigation .= '            <li><a class="dropdown-item" href="#">Another action</a></li>' . "\n";
+    // $navigation .= '            <li><hr class="dropdown-divider"></li>' . "\n";
+    // $navigation .= '            <li><a class="dropdown-item" href="#">Something else here</a></li>' . "\n";
+    // $navigation .= '          </ul>' . "\n";
+    // $navigation .= '        </li>' . "\n";
+    $navigation .= '      </ul>' . "\n";
 
-    $navigation .= '      <ul class="navbar-nav">';
-    $navigation .= '        <li class="nav-item me-3">';
-    $navigation .= '          <a class="btn btn-primary" href="' . WEB_ROOT . '/html/logout.phtml">Logout</a>';
-    $navigation .= '        </li>';
+    $navigation .= '      <div class="d-flex float-end">' . "\n";
+    $navigation .= '        <ul class="navbar-nav">' . "\n";
+    $navigation .= '          <li class="nav-item me-3">' . "\n";
+    $navigation .= '            <a class="btn btn-primary" href="' . WEB_ROOT . '/html/logout.phtml">Logout</a>' . "\n";
+    $navigation .= '          </li>' . "\n";
 
-    $navigation .= '      <form class="d-flex">'; // Configure this to POST to unique page for Searching by Usernames
-    $navigation .= '        <input name="xUSERNAME" class="form-control me-2" type="search" placeholder="Search @username" aria-label="Search">';
-    $navigation .= '        <button class="btn btn-outline-success" type="submit">Search</button>';
-    $navigation .= '      </form>';
-    $navigation .= '      </ul>';
-
+    $navigation .= '        <form name="xNAVSEARCH" class="d-flex" method="GET" action="' . WEB_ROOT . '/html/search.phtml">' . "\n";
+    $navigation .= '          <input name="USER" class="form-control me-2" type="search" placeholder="Search @username" aria-label="Search">' . "\n";
+    $navigation .= '          <button class="btn btn-outline-success" type="submit">Search</button>' . "\n";
+    $navigation .= '        </form>' . "\n";
+    $navigation .= '        </ul>' . "\n";
+    $navigation .= '        </div>' . "\n";
   }
   else
   {
-    $navigation .= '      <ul class="navbar-nav me-auto mb-2 mb-lg-0">';
-    $navigation .= '        <li class="nav-item">';
-    $navigation .= '          <a class="nav-link active" aria-current="page" href="#">Login</a>';
-    $navigation .= '        </li>';
-    $navigation .= '      </ul>';
+    $navigation .= '      <ul class="navbar-nav me-auto mb-2 mb-lg-0">' . "\n";
+    $navigation .= '        <li class="nav-item">' . "\n";
+    $navigation .= '          <a class="nav-link active" aria-current="page" href="' . WEB_ROOT . '/html/login.phtml">Login</a>' . "\n";
+    $navigation .= '        </li>' . "\n";
+    $navigation .= '        <li class="nav-item">' . "\n";
+    $navigation .= '          <a class="nav-link active" aria-current="page" href="' . WEB_ROOT . '/html/register.phtml">Register</a>' . "\n";
+    $navigation .= '        </li>' . "\n";
+    $navigation .= '      </ul>' . "\n";
   }
 
-  $navigation .= '    </div>';
-  $navigation .= '  </div>';
-  $navigation .= '</nav>';
+  $navigation .= '    </div>' . "\n";
+  $navigation .= '  </div>' . "\n";
+  $navigation .= '</nav>' . "\n";
 
   return $navigation;
 }
@@ -210,7 +218,7 @@ function DB_Search($table, $data)
 
 // function DB_LoadImages($id = $myACCOUNT['id'])
 // {
-  
+
 //   if($id === '')
 //   {
 //     return false;
