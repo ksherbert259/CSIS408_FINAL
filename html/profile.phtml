@@ -1,0 +1,102 @@
+<?php
+
+  require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
+
+  $USER = GetVar('USER', '');
+  $xUSER = PostVar('xUSER', $USER);
+
+  $the_user = array();
+  $the_image = array();
+  if($xUSER !== '')
+  {
+    // Initialize the search query
+    $result = DB_Search('users', array('username' => $xUSER));
+    $the_user = array_pop($result);
+
+    if($the_user === NULL)
+    {
+      $DEBUG_MESSAGE = 'The user does not exist!' . "<br>";
+    }
+
+    $result = DB_Search('images', array('image_id' => $the_user['image_id']));
+    $the_image = array_pop($result);
+    if($the_image === NULL)
+    {
+      $DEBUG_MESSAGE .= 'The image does not exist!';
+    }
+  }
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title><?php echo $USER; ?> | Social 02</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/main.css">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/bootstrap.min.css">
+<style>
+</style>
+<script src=""></script>
+<body>
+<?php
+  echo BuildNavigation();
+?>
+  <div class="container">
+    <div class="mt-3 bg-light border-2 rounded-3">
+      <div class="row align-content-center align-middle">
+        <div class="col-3 border-bottom"></div>
+        <div class="col-6 border-bottom">
+          <div class="border-2 rounded-3 px-3 pt-5">
+            <form name="xSEARCH" class="d-flex" method="GET" action="<?php echo WEB_ROOT . '/html/search.phtml'; ?>" enctype="multipart/form-data">
+              <input name="USER" class="form-control me-2" type="search" placeholder="Search @username" aria-label="Search" value="<?php echo $USER; ?>">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+        <div class="col-3 border-bottom"></div>
+      </div>
+      <div class="row">
+        <table class="table table-dark">
+          <tbody>
+            <tr>
+              <td>
+                <img src="<?php echo WEB_ROOT . '/env/feeder.phtml?GET=IMG&ID=' . $the_user['image_id']; ?>" style="max-height: 100px; max-width: 50px;" class="rounded-pill">
+              </td>
+              <td>
+                <h5>@<?php echo $the_user['username'] ?></h3>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="align-center">
+                <h5><?php echo ucwords($the_user['full_name']); ?></h5>
+              </td>
+              <td class="text-center">
+<?php
+$sqlfriend = "SELECT * FROM friendswith fw WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " AND fw.user2_id = " . $the_user['id'] . ") OR (fw.user1_id = " . $the_user['id'] . " AND fw.user2_id = " . $_SESSION['USER_ID'] . ")";
+if($resultfriend = mysqli_query($DB, $sqlfriend)){
+  if(mysqli_num_rows($resultfriend) > 0){
+    //They are friends
+    echo '<a class="btn btn-secondary" href="#" role="button">Remove Friend</a>';
+  } else {
+    //They are not friends
+    echo '<a class="btn btn-primary" href="#" role="button">Add Friend</a>';
+  }
+}
+
+?>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <h5><em><?php echo ($the_user['is_admin'] === '1') ? 'administrator' : 'user'; ?></em></h5>
+              </td>
+              <td colspan="2"><h5><?php echo $the_user['status']; ?></h5></td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+  </div>
+</body>
+</html>
