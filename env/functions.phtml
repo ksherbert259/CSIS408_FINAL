@@ -163,7 +163,7 @@ function DB_Insert($table, $data)
   {
     echo 'Failed to insert the query with table - ' . $table . "\n";
     echo 'Query : ' . $query . "\n";
-    echo $DB->error_get_last();
+    // echo $DB->error_get_last();
   }
 
   // Set the newly created id as return
@@ -214,6 +214,51 @@ function DB_Search($table, $data)
   }
 
   return $rows;
+}
+
+function DB_Delete($table, $data = array('id' => '0'))
+{
+  global $DB;
+  global $DEBUG_MESSAGE;
+  $record = array();
+  $result = false;
+
+  // Retrieve an indexed list of all tables
+  $all_tables = json_decode(DB_TABLES);
+  $all_tables = array_flip($all_tables);
+
+  // Check if the given table exists
+  $okay = (array_key_exists($table, $all_tables));
+  if(!$okay)
+  {
+    echo 'Failed to find a valid table. - ' . $table . "\n";
+  }
+
+  // Search for a record with a matching ID
+  $record = DB_Search($table, $data);
+  if(count($record) === 1)
+  {
+    $query = 'DELETE FROM ' . $table . ' WHERE';
+    foreach($data as $col => $value)
+    {
+      $query .= ' ' . $col . ' = ' . '\'' . $value . '\' AND';
+    }
+    $query = rtrim($query, ' AND');
+
+    $result = $DB->query($query);
+    if(!$result)
+    {
+      $DEBUG_MESSAGE = 'Record in ' . $table . ' could not be deleted! ';
+      $DEBUG_MESSAGE .= '[ ' . json_encode($data) . ' ]';
+    }
+  }
+  else
+  {
+    $DEBUG_MESSAGE = 'Record does not exist';
+    $DEBUG_MESSAGE .= '[ ' . json_encode($data) . ' ]';
+  }
+
+  return (Boolean)$result;
 }
 
 // function DB_LoadImages($id = $myACCOUNT['id'])
