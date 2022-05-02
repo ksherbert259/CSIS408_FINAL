@@ -1,0 +1,44 @@
+<?php
+
+  require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
+
+  $GET = GetVar('GET', '');
+  $ID = GetVar('ID', '0');
+
+  if($GET === 'IMG')
+  {
+    $type = '';
+    $data = '';
+    $size = '';
+    $name = '';
+
+    do
+    {
+      // Don't deliver any image. Invalid ID
+      if($ID === '0')
+      {
+        break;
+      }
+
+      $IMAGE = array('image_id' => $ID);
+      $record = DB_Search('images', $IMAGE);
+      $record = array_pop($record);
+
+      if($record)
+      {
+        $data = $record['image_data'];
+        $type = $record['image_type'];
+        $name = $record['image_name'];
+        $size = $record['image_size'];
+      }
+    }
+    while(0);
+
+    header('Content-Disposition: inline; filename="' . $name . '"');
+    header('Content-type:' . $type);
+    header('Content-Length:' . $size);
+    echo base64_decode($data);
+    exit;
+  }
+
+?>
