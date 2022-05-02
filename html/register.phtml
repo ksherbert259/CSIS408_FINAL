@@ -8,16 +8,7 @@
   $xPASSWORD = PostVar('xPASSWORD', '');
   $xFULLNAME = PostVar('xFULLNAME', '');
   $xISADMIN = PostVar('xISADMIN', '0');
-  $xPROFILEPICTURE = PostFile('xPROFILEPICTURE');
-
-  // Redirect the user to the appropriate landing page
-  // if($myACCOUNT['id'] !== '')
-  {
-    echo 'You are currently logged in as "' . $myACCOUNT['full_name'] . '"<br>' . "\n";
-    echo 'This account is a ' . $myACCOUNT_TYPE . '<br>' . "\n";
-    // HeaderLocation(WEB_ROOT . '/html/' . $myACCOUNT_TYPE . '/index.phtml');
-    // exit;
-  }
+  $xIMAGE = PostFile('xIMAGE');
 
   // Sanitize the input
   if($xTASK === 'REGISTER')
@@ -77,25 +68,39 @@
   $IMAGE = array();
   if($xTASK === 'REGISTER')
   {
+    $okay = false;
+
     do
     {
       // Insert Image if found
-      $new_id = NULL;
-      if($xPROFILEPICTURE['error'] !== UPLOAD_ERR_NO_FILE && (file_exists($xPROFILE)))
+      $new_id = 0;
+      if(($xIMAGE['error'] === UPLOAD_ERR_OK) && (file_exists($xIMAGE['tmp_name'])))
       {
-        $img_data = @file_get_contents($xPROFILEPICTURE['tmp_name']);
-        $IMAGE['image_type'] = $xPROFILEPICTURE['type'];
+        $timestamp = date('Y-m-d H:i:s');
+        $img_data = base64_encode(@file_get_contents($xIMAGE['tmp_name']));
+        $IMAGE['image_name'] = $xIMAGE['name'];
+        $IMAGE['image_size'] = $xIMAGE['size'];
+        $IMAGE['image_type'] = $xIMAGE['type'];
+        $IMAGE['timestamp'] = $timestamp;
         $IMAGE['image_data'] = $img_data;
-        $new_id = DB_Insert('images', $IMAGE);
+        $okay = DB_Insert('images', $IMAGE);
 
         // Ensure the insert is successful
-        $okay = (is_bool($new_id) && ($new_id > 0));
         if(!$okay)
         {
           echo 'Failed to upload the user image. ';
-          echo $DB->error_get_last();
           break;
         }
+
+        unset($IMAGE['image_data']); // Don't search by this
+        $record = DB_Search('images', $IMAGE);
+        $record = array_pop($record);
+        $new_id = $record['image_id'];
+      }
+      else
+      {
+        $DEBUG_MESSAGE = $xIMAGE['error'] . ' - Image Error!';
+        break;
       }
 
       // Update User Information
@@ -120,11 +125,11 @@
 
     if($okay)
     {
-      $acc_type = ($user[0]['is_admin'] === '1') ? 'administrators' : 'users';
-      $_SESSION['USER_ARRAY'] = $user[0];
-      $_SESSION['USER_ID'] = $user[0]['id'];
+      $acc_type = ($USER[0]['is_admin'] === '1') ? 'administrators' : 'users';
+      $_SESSION['USER_ARRAY'] = $USER[0];
+      $_SESSION['USER_ID'] = $USER[0]['id'];
       $_SESSION['USER_TYPE'] = $acc_type;
-      HeaderLocation(WEB_ROOT . '/html/' . $acc_type . '/index.phtml');
+      HeaderLocation(WEB_ROOT . '/html/' . $acc_type . '/index.phtml?REF=NEW');
       exit;
     }
   }
@@ -184,6 +189,15 @@
 <body>
 <?php echo BuildNavigation(); ?>
 <div class="container">
+<div class="row">
+    <div class="col-12 text-center px-3 pt-5 DEBUG_MESSAGE">
+      <p>
+<?php
+  echo $DEBUG_MESSAGE;
+?>
+      </p>
+    </div>
+  </div>
   <div class="row">
     <div class="col-1"></div>
     <div class="col-10 debug">
