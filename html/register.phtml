@@ -182,6 +182,7 @@
 
 </script>
 <body>
+<?php echo BuildNavigation(); ?>
 <div class="container">
   <div class="row">
     <div class="col-1"></div>
@@ -205,12 +206,8 @@
             <input type="text" id="xFULLNAME" name="xFULLNAME" class="form-control">
           </div>
           <div class="mb-3 mt-3">
-            <label for="xEMAIL" class="form-label">Email Address</label>
-            <input type="email" id="xEMAIL" name="xEMAIL" class="form-control">
-          </div>
-          <div class="mb-3 mt-3">
             <label for="xIMAGE" class="form-label">Profile Picture</label>
-            <input type="file" id="xIMAGE" name="xIMAGE" class="form-control-file">
+            <input type="file" id="xIMAGE" name="xIMAGE" class="form-control">
           </div>
           <div class="mb-3 mt-3">
             <input type="checkbox" id="xISADMIN" name="xISADMIN" class="form-check-input" value="1">
