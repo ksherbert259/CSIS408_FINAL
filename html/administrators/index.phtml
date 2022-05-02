@@ -2,73 +2,115 @@
 
   require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
 
+  $REF = GetVar('REF', '');
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <meta charset="UTF-8">
 <title>Home | Social 02</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/main.css">
 <link rel="stylesheet" href="<?php echo WEB_ROOT; ?>/library/css/bootstrap.min.css">
-<style>
-</style>
-<script>
-  function Validate(theform, thetask)
-  {
-    var okay = false;
-    do
-    {
-      // Verify the username is not empty
-      if(theform.xUSERNAME.value === '')
-      {
-        console.log("The username cannot be empty.");
-        break;
-      }
-
-      if(theform.xPASSWORD.value === '')
-      {
-        console.log("The password cannot be empty.");
-        break;
-      }
-
-      okay = true;
-    }
-    while(0);
-
-    // Submit the form if all checks succeed
-    if(okay)
-    {
-      theform.xTASK.value = thetask;
-      theform.submit();
-    }
-
-    return false;
-  }
-
-</script>
+<style></style>
+<script src=""></script>
 <body>
 <?php
   echo BuildNavigation();
 ?>
   <div class="container">
     <div class="row">
-      <div class="col"></div>
-      <div class="col debug">
-        <form name="xFORM" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
-          <input type="hidden" name="xTASK" value="">
-          <div class="mb-3 mt-3">
-            <label for="xUSERNAME" class="form-label">Username</label>
-            <input type="text" id="xUSERNAME" name="xUSERNAME" class="form-control">
-          </div>
-          <div class="mb-3 mt-3">
-            <label for="xPASSWORD" class="form-label">Password</label>
-            <input type="password" id="xPASSWORD" name="xPASSWORD" class="form-control">
-          </div>
-          <div class="col-auto">
-            <button onclick="Validate(document.xFORM, 'LOGIN')" class="btn btn-primary mb-3">Login</button>
-          </div>
-        </form>
+      <div class="col-1"></div>
+      <div class="col-10 debug">
+        <div class="border-2 rounded-3 px-3 pt-5">
+<?php
+
+  if($REF === 'NEW')
+  {
+    echo '<h5>Congratulations on your NEW account!</h5>' . "\n";
+    echo '<h5>To get started! Search for some friends! I recommend "Morg"</h5>' . "\n";
+    echo '<br>';
+  }
+
+?>
+<?php
+$sql = "SELECT u.full_name, u.image_id AS user_image_id, u.is_deleted AS user_is_deleted, p.id, p.text, p.user_id, p.image_id, p.datetime_add, p.is_deleted FROM posts p LEFT JOIN users u ON u.id = p.user_id LEFT JOIN friendswith fw ON fw.user1_id = p.user_id OR fw.user2_id = p.user_id WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " OR fw.user2_id = " . $_SESSION['USER_ID'] . ") ORDER BY p.datetime_add DESC";
+if($result = mysqli_query($DB, $sql)){
+  if(mysqli_num_rows($result) > 0){
+    while($row = mysqli_fetch_array($result)){
+      echo "<div class=\"post\" id=post" . $row['id'] . ">";
+      // TODO Fix profile picture display
+      if(!is_null($row['user_image_id'])){
+        echo '<img src="' . WEB_ROOT . '/env/image_get.phtml?image_id=' . $row['user_image_id'] . '"/>';
+        echo "there's supposed to be an image here";
+      }
+
+      echo $row['user_image_type'];
+
+      echo "<div class=username>" . $row['full_name'] . "</div>";
+      echo "<p class=caption>" . $row['text'] . "</p>";
+      // TODO Add image
+      echo "<div class=datetime>" . $row['datetime_add'] . "</div>";
+      // Reactions
+
+      echo "<div class=reactions>";
+      echo '<a href=' . WEB_ROOT . '/env/react.phtml?POST_ID=' . $row['id'] . '&IS_LIKE=1>';
+      // Color thumb red if already active
+      $sqlisliked = "SELECT user_id FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 1 AND user_id = " . $_SESSION['USER_ID'];
+      if($resultisliked = mysqli_query($DB, $sqlisliked)){
+        if(mysqli_num_rows($resultisliked) > 0){
+          echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(31%) sepia(62%) saturate(4329%) hue-rotate(209deg) brightness(100%) contrast(102%);"/>';
+        } else echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(70%);"/>';
+      }
+      echo '</a>';
+
+      $sqllikes = "SELECT COUNT(user_id) AS likes FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 1";
+      if($resultlikes = mysqli_query($DB, $sqllikes)){
+        if(mysqli_num_rows($resultlikes) > 0){
+          $rowlikes = mysqli_fetch_array($resultlikes);
+          echo "<div>" . $rowlikes['likes'] . "</div>";
+          // Free result set
+          mysqli_free_result($resultlikes);
+        } else {
+          echo "<div>0</div>";
+        }
+      }
+
+      echo '<a href=' . WEB_ROOT . '/env/react.phtml?POST_ID=' . $row['id'] . '&IS_LIKE=0>';
+      // Color thumb red if already active
+      $sqlisliked = "SELECT user_id FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 0 AND user_id = " . $_SESSION['USER_ID'];
+      if($resultisliked = mysqli_query($DB, $sqlisliked)){
+        if(mysqli_num_rows($resultisliked) > 0){
+          echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(31%) sepia(62%) saturate(4329%) hue-rotate(209deg) brightness(100%) contrast(102%); transform: scaleY(-1);"/>';
+        } else echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(70%); transform: scaleY(-1);"/>';
+      }
+      echo '</a>';
+
+      $sqldislikes = "SELECT COUNT(user_id) AS dislikes FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 0";
+      if($resultdislikes = mysqli_query($DB, $sqldislikes)){
+        if(mysqli_num_rows($resultdislikes) > 0){
+          $rowdislikes = mysqli_fetch_array($resultdislikes);
+          echo "<div>" . $rowdislikes['dislikes'] . "</div>";
+          // Free result set
+          mysqli_free_result($resultdislikes);
+        } else {
+          echo "<div>0</div>";
+        }
+      }
+      echo "</div>"; // Reactions
+      echo "</div>"; // Post
+    }
+
+    // Free result set
+    mysqli_free_result($result);
+  } else {
+      echo "No posts yet! Make some friends to get started.";
+  }
+}
+?>
+        </div>
       </div>
-      <div class="col"></div>
+      <div class="col-1"></div>
     </div>
   </div>
 </body>
