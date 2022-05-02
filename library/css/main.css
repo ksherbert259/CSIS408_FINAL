@@ -32,7 +32,7 @@ img {
 
 .post {
   margin-bottom: 30px;
-  background-color: #333;
+  background-color: #212529;
   border-radius: 10px;
   padding: 20px;
 }
@@ -55,4 +55,11 @@ img {
 
 .reactions {
   color: #aaa;
+}
+
+.reactions > div {
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 10px;
+  display: inline-block;
 }
