@@ -73,16 +73,20 @@
               </td>
               <td class="text-center">
 <?php
-$sqlfriend = "SELECT * FROM friendswith fw WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " AND fw.user2_id = " . $the_user['id'] . ") OR (fw.user1_id = " . $the_user['id'] . " AND fw.user2_id = " . $_SESSION['USER_ID'] . ")";
-if($resultfriend = mysqli_query($DB, $sqlfriend)){
-  if(mysqli_num_rows($resultfriend) > 0){
-    //They are friends
-    echo '<a class="btn btn-secondary" href="#" role="button">Remove Friend</a>';
-  } else {
-    //They are not friends
-    echo '<a class="btn btn-primary" href="#" role="button">Add Friend</a>';
+
+  if($the_user['id'] !== $myACCOUNT['id'])
+  {
+    $sqlfriend = "SELECT * FROM friendswith fw WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " AND fw.user2_id = " . $the_user['id'] . ") OR (fw.user1_id = " . $the_user['id'] . " AND fw.user2_id = " . $_SESSION['USER_ID'] . ")";
+    if($resultfriend = mysqli_query($DB, $sqlfriend)){
+      if(mysqli_num_rows($resultfriend) > 0){
+        //They are friends
+        echo '<a class="btn btn-secondary" href="#" role="button">Remove Friend</a>';
+      } else {
+        //They are not friends
+        echo '<a class="btn btn-primary" href="#" role="button">Add Friend</a>';
+      }
+    }
   }
-}
 
 ?>
               </td>
