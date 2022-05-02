@@ -1,0 +1,71 @@
+<?php
+
+  // Redirect the user to the appropriate landing page
+  // if($myACCOUNT['id'] !== 'users' && $myACCOUNT['id'] !== 'administrators')
+  // {
+  //   HeaderLocation(WEB_ROOT . '/html/login.phtml');
+  //   exit;
+  // }
+
+  require "include.phtml";
+  if(isset($_GET['FRIEND_ID'])) {
+      // Set some required variables
+      $frienddata = array();
+      $frienddata['user1_id'] = $_SESSION['USER_ID'];
+      $frienddata['user2_id'] = $_GET['FRIEND_ID'];
+
+      echo "SELECT * FROM friendswith fw WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " AND fw.user2_id = " . $_GET['FRIEND_ID'] . ") OR (fw.user1_id = " . $_GET['FRIEND_ID'] . " AND fw.user2_id = " . $_SESSION['USER_ID'] . ")";
+
+      $sqlfriend = "SELECT * FROM friendswith fw WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " AND fw.user2_id = " . $_GET['FRIEND_ID'] . ") OR (fw.user1_id = " . $_GET['FRIEND_ID'] . " AND fw.user2_id = " . $_SESSION['USER_ID'] . ")";
+      if($resultfriend = mysqli_query($DB, $sqlfriend)){
+        if(mysqli_num_rows($resultfriend) > 0){
+          // They are friends
+
+          $frienddeletedata = array();
+
+          $sqlfriend = "SELECT * FROM friendswith fw WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " AND fw.user2_id = " . $_GET['FRIEND_ID'] . ")";
+          if($resultfriend = mysqli_query($DB, $sqlfriend)){
+            if(mysqli_num_rows($resultfriend) > 0){
+              $frienddeletedata['user1_id'] = $_SESSION['USER_ID'];
+              $frienddeletedata['user2_id'] = $_GET['FRIEND_ID'];
+            } else {
+              $frienddeletedata['user2_id'] = $_SESSION['USER_ID'];
+              $frienddeletedata['user1_id'] = $_GET['FRIEND_ID'];
+            }
+          
+          DB_Delete('friendswith', $frienddeletedata);
+          }
+        } else {
+          // They are not friends
+          // Set some required variables
+          $frienddata = array();
+          $frienddata['user1_id'] = $_SESSION['USER_ID'];
+          $frienddata['user2_id'] = $_GET['FRIEND_ID'];
+          DB_Insert('friendswith', $frienddata);
+        }
+      } else {
+        echo "SQL Error";
+      }
+      
+      // DB_Insert('reactions', $reactdata);
+      // echo "we got the is_like";
+    }
+
+    if(isset($_GET['QUERY']) && isset($_GET['FRIEND_ID'])){
+      HeaderLocation(WEB_ROOT . '/html/search.phtml?USER=' . $_GET['QUERY'] . '#' . $_GET['FRIEND_ID']);
+      exit;
+    } else {
+      HeaderLocation(WEB_ROOT . '/html/search.phtml');
+      exit;
+    }
+    // // echo "we got the post ID";
+    // echo "we don't have post id";
+  // echo "anyone here?";
+?>
+
+<!DOCTYPE html>
+<html>
+  <body>
+
+  </body>
+</html>

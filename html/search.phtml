@@ -89,7 +89,7 @@
     echo $spaces . '<div class="px-3 py-3">' . "\n";
     echo '<div class="mb-2"><h4>Listing all users matching \'' . strtolower($USER) . '\'</h4><div>' . "\n";
     echo '<table class="table table-striped">' . "\n";
-    echo '<tr><td>icon</td><td>Username</td></tr>' . "\n";
+    echo '<tr><td>icon</td><td>Username</td><td>Options</td></tr>' . "\n";
 
     $row_cnt = 'bg-dark';
     foreach($all_users as $cnt => $user)
@@ -106,16 +106,40 @@
 
 ?>
             <!-- <div class="my-1 border-2 rounded-3 d-flex align-content-center align-items-center align-baseline <?php echo $row_cnt; ?>"> -->
-                <tr>
+                <tr id=<?php echo $user['username'] ?>>
                   <td>
                     <div class="profile px-2">
                       <?php echo $img_elem; ?>
-                      <!-- <img src="<?php echo $img_url; ?>" style="width: 40px;" class="rounded-pill"> -->
+                      <img src="<?php echo $img_url; ?>" style="width: 40px;" class="rounded-pill">
                     </div>
                   </td>
                   <td>
                     <div class="username align-baseline">
                       <p><?php echo $user['username']; ?></p>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="friend">
+                      <?php
+                        if($user['id'] != $_SESSION['USER_ID']) { // Disallow user becoming friends with himself
+                          $sqlfriend = "SELECT * FROM friendswith fw WHERE (fw.user1_id = " . $_SESSION['USER_ID'] . " AND fw.user2_id = " . $user['id'] . ") OR (fw.user1_id = " . $user['id'] . " AND fw.user2_id = " . $_SESSION['USER_ID'] . ")";
+                          if($resultfriend = mysqli_query($DB, $sqlfriend)){
+                            if(mysqli_num_rows($resultfriend) > 0){
+                              // They are friends
+                              echo '<a class="btn btn-secondary" href="' . WEB_ROOT . '/env/friend.phtml?FRIEND_ID=' . $user['id'] . '&QUERY=' . $_GET['USER'] . '" role="button">Remove Friend</a>';
+                            } else {
+                              // They are not friends
+                              echo '<a class="btn btn-primary" href="' . WEB_ROOT . '/env/friend.phtml?FRIEND_ID=' . $user['id'] . '&QUERY=' . $_GET['USER'] . '" role="button">Add Friend</a>';
+                            }
+                          }
+                        }
+
+                        if($_SESSION['USER_TYPE'] == "administrators" && $user['id'] != $_SESSION['USER_ID']) {
+                          echo '<a class="btn btn-danger" href="' . WEB_ROOT . '/env/deleteuser.phtml?DELETE_ID=' . $user['id'] . '&QUERY=' . $_GET['USER'] . '" role="button" style="margin-left: 10px;">Delete User</a>';
+                        }
+                      ?>
+                      
+                      
                     </div>
                   </td>
                 </tr>

@@ -1,0 +1,31 @@
+<?php
+
+  // Redirect the user to the appropriate landing page
+  // if($myACCOUNT['id'] !== 'users' && $myACCOUNT['id'] !== 'administrators')
+  // {
+  //   HeaderLocation(WEB_ROOT . '/html/login.phtml');
+  //   exit;
+  // }
+
+  require "include.phtml";
+  if(isset($_GET['DELETE_ID'])) {
+    $deleteuserdata = array();
+    $deleteuserdata['id'] = $_GET['DELETE_ID'];
+    DB_Delete('users', $deleteuserdata);
+  }
+
+  if(isset($_GET['QUERY'])){
+    HeaderLocation(WEB_ROOT . '/html/search.phtml?USER=' . $_GET['QUERY']);
+    exit;
+  } else {
+    HeaderLocation(WEB_ROOT . '/html/search.phtml');
+    exit;
+  }
+?>
+
+<!DOCTYPE html>
+<html>
+  <body>
+
+  </body>
+</html>
