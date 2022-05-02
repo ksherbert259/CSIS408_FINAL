@@ -1,0 +1,75 @@
+<?php
+
+  // Redirect the user to the appropriate landing page
+  // if($myACCOUNT['id'] !== 'users' && $myACCOUNT['id'] !== 'administrators')
+  // {
+  //   HeaderLocation(WEB_ROOT . '/html/login.phtml');
+  //   exit;
+  // }
+
+  require "include.phtml";
+  if(isset($_GET['POST_ID'])) {
+    if(isset($_GET['IS_LIKE'])) {
+
+      // echo "User's got a like and post ID";
+
+      // Set some required variables
+      $reactdata = array();
+      $reactdata['user_id'] = $_SESSION['USER_ID'];
+      $reactdata['post_id'] = $_GET['POST_ID'];
+
+      // echo 'SELECT * FROM reactions WHERE post_id = ' . $_GET['POST_ID'] . ' AND user_id = ' . $_SESSION['USER_ID'];
+
+      $sqlreact = 'SELECT * FROM reactions WHERE post_id = ' . $_GET['POST_ID'] . ' AND user_id = ' . $_SESSION['USER_ID'];
+      if($resultreact = mysqli_query($DB, $sqlreact)){
+        if(mysqli_num_rows($resultreact) > 0){
+          $rowreact = mysqli_fetch_array($resultreact);
+          if($rowreact['is_like'] == 1){ // User's existing reaction is a like
+            // echo "User's existing reaction is a like";
+            if($_GET['IS_LIKE'] == 1){ // User is liking it again
+              // echo "User is liking it again";
+              DB_Delete('reactions', $reactdata); // Remove like (making the button a toggle)
+            } else { // User wants to change their like into a dislike
+              // echo "User wants to change their like into a dislike";
+              DB_Delete('reactions', $reactdata);
+              $reactdata['is_like'] = $_GET['IS_LIKE'];
+              DB_Insert('reactions', $reactdata);
+            }
+          } else { // User's existing reaction is a dislike
+            // echo "User's existing reaction is a dislike";
+            if($_GET['IS_LIKE'] == 0){ // User is disliking it again
+              // echo "User is disliking it again";
+              DB_Delete('reactions', $reactdata); // Remove like (making the button a toggle)
+            } else { // User wants to change their dislike into a like
+              // echo "User wants to change their dislike into a like";
+              DB_Delete('reactions', $reactdata);
+              $reactdata['is_like'] = $_GET['IS_LIKE'];
+              DB_Insert('reactions', $reactdata);
+            }
+          }
+        } else { // User has not liked or disliked it yet
+          $reactdata['is_like'] = $_GET['IS_LIKE'];
+          DB_Insert('reactions', $reactdata);
+        }
+      } else echo "sql error2";
+      
+      // DB_Insert('reactions', $reactdata);
+      // echo "we got the is_like";
+    }
+    HeaderLocation(WEB_ROOT . '/html/' . $myACCOUNT_TYPE . '/index.phtml#post' . $_GET['POST_ID']);
+    exit;
+    // echo "we got the post ID";
+  } else {
+    HeaderLocation(WEB_ROOT . '/html/' . $myACCOUNT_TYPE . '/index.phtml');
+    exit;
+    // echo "we don't have post id";
+  }
+  // echo "anyone here?";
+?>
+
+<!DOCTYPE html>
+<html>
+  <body>
+
+  </body>
+</html>

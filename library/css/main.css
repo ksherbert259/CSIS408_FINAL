@@ -56,3 +56,10 @@ img {
 .reactions {
   color: #aaa;
 }
+
+.reactions > div {
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 10px;
+  display: inline-block;
+}

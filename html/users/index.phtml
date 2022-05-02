@@ -48,31 +48,53 @@ if($result = mysqli_query($DB, $sql)){
       // TODO Add image
       echo "<div class=datetime>" . $row['datetime_add'] . "</div>";
       // Reactions
+
+      echo "<div class=reactions>";
+      echo '<a href=' . WEB_ROOT . '/env/react.phtml?POST_ID=' . $row['id'] . '&IS_LIKE=1>';
+      // Color thumb red if already active
+      $sqlisliked = "SELECT user_id FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 1 AND user_id = " . $_SESSION['USER_ID'];
+      if($resultisliked = mysqli_query($DB, $sqlisliked)){
+        if(mysqli_num_rows($resultisliked) > 0){
+          echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(31%) sepia(62%) saturate(4329%) hue-rotate(209deg) brightness(100%) contrast(102%);"/>';
+        } else echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(70%);"/>';
+      }
+      echo '</a>';
+
       $sqllikes = "SELECT COUNT(user_id) AS likes FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 1";
       if($resultlikes = mysqli_query($DB, $sqllikes)){
         if(mysqli_num_rows($resultlikes) > 0){
           $rowlikes = mysqli_fetch_array($resultlikes);
-          echo "<div class=reactions>" . $rowlikes['likes'] . " likes, ";
+          echo "<div>" . $rowlikes['likes'] . "</div>";
           // Free result set
           mysqli_free_result($resultlikes);
         } else {
-          echo "<div class=reactions>0 likes, ";
+          echo "<div>0</div>";
         }
       }
+
+      echo '<a href=' . WEB_ROOT . '/env/react.phtml?POST_ID=' . $row['id'] . '&IS_LIKE=0>';
+      // Color thumb red if already active
+      $sqlisliked = "SELECT user_id FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 0 AND user_id = " . $_SESSION['USER_ID'];
+      if($resultisliked = mysqli_query($DB, $sqlisliked)){
+        if(mysqli_num_rows($resultisliked) > 0){
+          echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(31%) sepia(62%) saturate(4329%) hue-rotate(209deg) brightness(100%) contrast(102%); transform: scaleY(-1);"/>';
+        } else echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(70%); transform: scaleY(-1);"/>';
+      }
+      echo '</a>';
 
       $sqldislikes = "SELECT COUNT(user_id) AS dislikes FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 0";
       if($resultdislikes = mysqli_query($DB, $sqldislikes)){
         if(mysqli_num_rows($resultdislikes) > 0){
           $rowdislikes = mysqli_fetch_array($resultdislikes);
-          echo $rowdislikes['dislikes'] . " dislikes</div>";
+          echo "<div>" . $rowdislikes['dislikes'] . "</div>";
           // Free result set
           mysqli_free_result($resultdislikes);
         } else {
-          echo "0 dislikes</div>";
+          echo "<div>0</div>";
         }
       }
-
-      echo "</div>";
+      echo "</div>"; // Reactions
+      echo "</div>"; // Post
     }
 
     // Free result set
