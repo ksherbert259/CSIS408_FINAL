@@ -1,4 +1,4 @@
-<?php  
+<?php
 
   require $_SERVER['DOCUMENT_ROOT'] . '/spring_2022/csis408/social02/env/include.phtml';
 
@@ -36,12 +36,9 @@ if($result = mysqli_query($DB, $sql)){
     while($row = mysqli_fetch_array($result)){
       echo "<div class=\"post\" id=post" . $row['id'] . ">";
       // TODO Fix profile picture display
-      if(!is_null($row['user_image_id'])){
-        echo '<img src="' . WEB_ROOT . '/env/image_get.phtml?image_id=' . $row['user_image_id'] . '"/>';
-        echo "there's supposed to be an image here";
+      if(!is_null($row['user_image_id'])) {
+        echo '<img src="' . WEB_ROOT . '/env/feeder.phtml?GET=IMG&ID=' . $row['user_image_id'] . '"/ style="max-width:500px; max-height:500px"class="rounded-1">';
       }
-
-      echo $row['user_image_type'];
 
       echo "<div class=username>" . $row['full_name'] . "</div>";
       echo "<p class=caption>" . $row['text'] . "</p>";
@@ -76,7 +73,7 @@ if($result = mysqli_query($DB, $sql)){
       // Color thumb red if already active
       $sqlisliked = "SELECT user_id FROM reactions WHERE post_id = " . $row['id'] . " AND is_like = 0 AND user_id = " . $_SESSION['USER_ID'];
       if($resultisliked = mysqli_query($DB, $sqlisliked)){
-        if(mysqli_num_rows($resultisliked) > 0){
+        if(mysqli_num_rows($resultisliked) > 0) {
           echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(31%) sepia(62%) saturate(4329%) hue-rotate(209deg) brightness(100%) contrast(102%); transform: scaleY(-1);"/>';
         } else echo '<img src="' . WEB_ROOT . '/env/ref/thumbs-up.svg" style="width: 20px; height: 20px; filter: invert(70%); transform: scaleY(-1);"/>';
       }

@@ -4,9 +4,11 @@
 
   // Get the variable names
   $xTEXT = PostVar('xTEXT', '');
+  $xSUBMIT = PostVar('xSUBMIT');
+  $xIMAGE = PostFile('xIMAGE');
 
-  // Ensure the user is logged in to a valid 'user' level.
-  if($myACCOUNT_TYPE !== 'users')
+  // Ensure the user is logged in to a valid 'administrator' level.
+  if($myACCOUNT_TYPE !== 'administrators')
   {
     HeaderLocation(WEB_ROOT . '/html/login.phtml');
     exit;
